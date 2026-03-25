@@ -576,8 +576,39 @@
       style="background:#1a1a0a;border:1px solid #faad1466;border-radius:8px;color:#faad14;font-size:12px;padding:7px 14px;cursor:pointer;">🧹 清除指定UID</button>
     <button onclick="clearAllRecords()"
       style="background:#1a0a0a;border:1px solid #ff4d4f66;border-radius:8px;color:#ff4d4f;font-size:12px;padding:7px 14px;cursor:pointer;">🗑️ 清除全部记录</button>
+    <button onclick="showManualAdd()"
+      style="background:#1a0a2e;border:1px solid #b37feb88;border-radius:8px;color:#b37feb;font-size:12px;padding:7px 14px;cursor:pointer;">📝 手动登记奖励</button>
   </div>
   <div id="allUsersRecords"></div>
+</div>
+
+<!-- 手动登记奖励模态框 -->
+<div id="manualAddModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#131929;border:1px solid #b37feb88;border-radius:16px;padding:24px;width:90%;max-width:360px;box-shadow:0 8px 32px rgba(0,0,0,0.6);">
+    <h3 style="color:#b37feb;font-size:16px;margin-bottom:6px;">📝 手动登记用户奖励</h3>
+    <p style="color:#888;font-size:12px;margin-bottom:16px;">用户截图发群后，在此登记到管理端记录</p>
+    <div style="margin-bottom:12px;">
+      <label style="color:#aaa;font-size:12px;display:block;margin-bottom:4px;">用户 UID（纯数字）</label>
+      <input id="manualUID" type="text" placeholder="例：76175051568852992"
+        style="width:100%;background:#0d0d1a;border:1px solid #444;border-radius:8px;color:#fff;font-size:14px;padding:9px 12px;outline:none;">
+    </div>
+    <div style="margin-bottom:16px;">
+      <label style="color:#aaa;font-size:12px;display:block;margin-bottom:4px;">开奖日期</label>
+      <input id="manualDate" type="date"
+        style="width:100%;background:#0d0d1a;border:1px solid #444;border-radius:8px;color:#fff;font-size:14px;padding:9px 12px;outline:none;">
+    </div>
+    <div id="manualPreview" style="display:none;background:#0d1828;border:1px solid #1e3a5a;border-radius:8px;padding:10px;margin-bottom:14px;font-size:13px;">
+      <span style="color:#aaa;">该日期奖励预测：</span>
+      <span id="manualPreviewPrize" style="color:#52c41a;font-weight:bold;"></span>
+    </div>
+    <div id="manualAddMsg" style="display:none;font-size:12px;padding:6px 10px;border-radius:6px;margin-bottom:10px;"></div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="doManualAdd()"
+        style="flex:1;background:#2a1050;border:1px solid #b37feb;border-radius:8px;color:#b37feb;font-size:13px;padding:9px;cursor:pointer;font-weight:bold;">✅ 确认登记</button>
+      <button onclick="closeManualAdd()"
+        style="flex:1;background:#1a1a2e;border:1px solid #444;border-radius:8px;color:#888;font-size:13px;padding:9px;cursor:pointer;">取消</button>
+    </div>
+  </div>
 </div>
 
 <!-- 解锁输入模态框 -->
@@ -1112,6 +1143,67 @@ function clearAllRecords() {
   alert(`已清除 ${keys.length} 个用户的所有记录`);
   if (currentUser) renderUnlockedList();
   renderAllUsersRecords();
+}
+
+// ===== 手动登记奖励 =====
+function showManualAdd() {
+  const modal = document.getElementById('manualAddModal');
+  modal.style.display = 'flex';
+  // 默认日期为今天
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth()+1).padStart(2,'0');
+  const dd = String(now.getDate()).padStart(2,'0');
+  document.getElementById('manualDate').value = `${yyyy}-${mm}-${dd}`;
+  document.getElementById('manualUID').value = '';
+  document.getElementById('manualPreview').style.display = 'none';
+  document.getElementById('manualAddMsg').style.display = 'none';
+  // 监听日期/UID变化自动预览奖励
+  ['manualUID','manualDate'].forEach(id => {
+    document.getElementById(id).oninput = updateManualPreview;
+  });
+  updateManualPreview();
+}
+function updateManualPreview() {
+  const uid = document.getElementById('manualUID').value.trim();
+  const dateVal = document.getElementById('manualDate').value;
+  const preview = document.getElementById('manualPreview');
+  if (!uid || !dateVal) { preview.style.display = 'none'; return; }
+  const [y,m,d] = dateVal.split('-').map(Number);
+  const prize = getPrize(uid, y, m, d);
+  document.getElementById('manualPreviewPrize').textContent = `${prize.emoji} ${prize.name}`;
+  preview.style.display = 'block';
+}
+function doManualAdd() {
+  const uid = document.getElementById('manualUID').value.trim();
+  const dateVal = document.getElementById('manualDate').value;
+  const msgEl = document.getElementById('manualAddMsg');
+  function showMsg(text, ok) {
+    msgEl.textContent = text;
+    msgEl.style.background = ok ? '#0d2a1a' : '#2a0d0d';
+    msgEl.style.color = ok ? '#52c41a' : '#ff7875';
+    msgEl.style.border = `1px solid ${ok ? '#52c41a44' : '#ff4d4f44'}`;
+    msgEl.style.display = 'block';
+  }
+  if (!uid) { showMsg('请填写用户 UID', false); return; }
+  if (!dateVal) { showMsg('请选择开奖日期', false); return; }
+  const [y,m,d] = dateVal.split('-').map(Number);
+  const dateKey = `${y}_${m}_${d}`;
+  const unlocked = loadUnlocked(uid);
+  if (unlocked[dateKey]) {
+    showMsg(`UID ${uid} 在 ${y}年${m}月${d}日 已有记录，无需重复登记`, false);
+    return;
+  }
+  unlocked[dateKey] = { ts: Date.now(), uid: uid, manual: true };
+  saveUnlocked(uid, unlocked);
+  const prize = getPrize(uid, y, m, d);
+  showMsg(`✅ 已登记！${y}年${m}月${d}日 · ${prize.emoji} ${prize.name}`, true);
+  renderAllUsersRecords();
+  // 1.5秒后自动关闭
+  setTimeout(() => { closeManualAdd(); }, 1500);
+}
+function closeManualAdd() {
+  document.getElementById('manualAddModal').style.display = 'none';
 }
 
 // ===== 管理员工具 =====
