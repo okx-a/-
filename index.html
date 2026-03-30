@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<!-- saved from url=(0041)file:///Users/oker/Downloads/index_1.html -->
-<html lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>OKX 交易日历抽奖</title>
 <style>
@@ -471,17 +471,17 @@
 </div>
 
 <!-- 昵称输入区 -->
-<div class="name-section" id="nameSection" style="display: none;">
+<div class="name-section" id="nameSection">
   <div class="name-box">
-    <label></label>
-    <input type="text" id="nameInput" placeholder="输入UID（纯数字）" maxlength="20" style="display: none;">
-    <button onclick="confirmName()" style="display: none;">确认</button>
+    <label>我的UID</label>
+    <input type="text" id="nameInput" placeholder="输入UID（纯数字）" maxlength="20">
+    <button onclick="confirmName()">确认</button>
   </div>
-  <div id="userBadge" style="display: block; margin-top: 10px;">
+  <div id="userBadge" style="display:none;margin-top:10px;">
     <div class="user-badge">
       <span>✅ 已确认：</span>
-      <span id="badgeName" style="font-weight:bold;color:#ffd700;">访客模式</span>
-      <span id="changeBtnWrap" onclick="changeName()" style="cursor:pointer;color:#555;font-size:11px;display:none;">更改</span>
+      <span id="badgeName" style="font-weight:bold;color:#ffd700;"></span>
+      <span onclick="changeName()" style="cursor:pointer;color:#555;font-size:11px;">更改</span>
     </div>
   </div>
 </div>
@@ -491,7 +491,7 @@
   <h3>🔐 管理员工具 · 生成解锁码</h3>
   <div class="admin-row">
     <input type="text" id="adminUser" placeholder="用户UID（纯数字）" style="flex:2;">
-    <input type="date" id="adminDate" style="color-scheme:dark;">
+    <input type="date" id="adminDate" style="color-scheme:dark;" style="flex:2;">
     <button onclick="generateCode()">查询解锁码 + 奖励预览</button>
   </div>
   <div class="admin-result" id="adminResult" style="display:none;">
@@ -503,19 +503,19 @@
 </div>
 
 <!-- 统计条 -->
-<div class="stats-bar" id="statsBar" style="display: flex;">
+<div class="stats-bar" id="statsBar" style="display:none;">
   <div class="stat-item">
     <div class="stat-num" id="statDays">0</div>
     <div class="stat-label">已开奖天数</div>
   </div>
   <div class="stat-item">
-    <div class="stat-num" id="statValue">0.0U</div>
+    <div class="stat-num" id="statValue">0U</div>
     <div class="stat-label">累计奖励</div>
   </div>
 </div>
 
 <!-- 使用说明 -->
-<div class="hint-banner" id="hintBanner" style="display: block;">
+<div class="hint-banner" id="hintBanner" style="display:none;">
   <div class="hint-box">
     <strong>📌 如何获得解锁码？</strong><br>
     发当天交易截图到群里 → 管理员核实后发给你<strong>4位解锁码</strong> → 点击对应日期输入解锁 → 奖励自动揭晓
@@ -524,12 +524,12 @@
 </div>
 
 <!-- 日历 -->
-<div class="calendar-wrap" id="calendarWrap" style="display: block;">
+<div class="calendar-wrap" id="calendarWrap" style="display:none;">
   <div class="cal-header">
     <div class="cal-nav">
       <button onclick="prevMonth()">‹</button>
     </div>
-    <div class="cal-title" id="calTitle">2026年 三月</div>
+    <div class="cal-title" id="calTitle"></div>
     <div class="cal-nav">
       <button onclick="nextMonth()">›</button>
     </div>
@@ -540,14 +540,14 @@
     <div class="weekday">四</div><div class="weekday">五</div>
     <div class="weekday">六</div>
   </div>
-  <div class="days-grid" id="daysGrid"><div class="day-cell past"><span class="day-num">1</span></div><div class="day-cell past"><span class="day-num">2</span></div><div class="day-cell past"><span class="day-num">3</span></div><div class="day-cell past"><span class="day-num">4</span></div><div class="day-cell past"><span class="day-num">5</span></div><div class="day-cell past"><span class="day-num">6</span></div><div class="day-cell past"><span class="day-num">7</span></div><div class="day-cell past"><span class="day-num">8</span></div><div class="day-cell past"><span class="day-num">9</span></div><div class="day-cell past"><span class="day-num">10</span></div><div class="day-cell past"><span class="day-num">11</span></div><div class="day-cell past"><span class="day-num">12</span></div><div class="day-cell past"><span class="day-num">13</span></div><div class="day-cell past"><span class="day-num">14</span></div><div class="day-cell past"><span class="day-num">15</span></div><div class="day-cell past"><span class="day-num">16</span></div><div class="day-cell past"><span class="day-num">17</span></div><div class="day-cell past-active"><span class="gift-icon">🎁</span><span class="day-num">18日</span></div><div class="day-cell past-active"><span class="gift-icon">🎁</span><span class="day-num">19日</span></div><div class="day-cell past-active"><span class="gift-icon">🎁</span><span class="day-num">20日</span></div><div class="day-cell past-active"><span class="gift-icon">🎁</span><span class="day-num">21日</span></div><div class="day-cell past-active"><span class="gift-icon">🎁</span><span class="day-num">22日</span></div><div class="day-cell past-active"><span class="gift-icon">🎁</span><span class="day-num">23日</span></div><div class="day-cell past-active"><span class="gift-icon">🎁</span><span class="day-num">24日</span></div><div class="day-cell past-active"><span class="gift-icon">🎁</span><span class="day-num">25日</span></div><div class="day-cell past-active"><span class="gift-icon">🎁</span><span class="day-num">26日</span></div><div class="day-cell past-active"><span class="gift-icon">🎁</span><span class="day-num">27日</span></div><div class="day-cell past-active"><span class="gift-icon">🎁</span><span class="day-num">28日</span></div><div class="day-cell past-active"><span class="gift-icon">🎁</span><span class="day-num">29日</span></div><div class="day-cell locked today"><span class="gift-icon">🎁</span><span class="day-num">30</span></div><div class="day-cell locked"><span class="gift-icon">🎁</span><span class="day-num">31</span></div></div>
+  <div class="days-grid" id="daysGrid"></div>
 </div>
 
 
 <!-- 已开奖列表 -->
-<div class="unlocked-list" id="unlockedList" style="display: block;">
+<div class="unlocked-list" id="unlockedList" style="display:none;">
   <div class="unlocked-title" id="unlockedListTitle">📋 我的开奖记录</div>
-  <div id="unlockedItems"><div style="color:#888;font-size:12px;text-align:center;padding:12px;">暂无开奖记录，将交易截图发给管理员获取解锁码 🔗</div></div>
+  <div id="unlockedItems"></div>
 </div>
 
 <!-- 管理员用户开奖记录（仅管理员可见） -->
@@ -559,19 +559,25 @@
   </div>
   <!-- UID搜索栏 -->
   <div style="display:flex;gap:8px;margin-bottom:10px;">
-    <input id="uidSearch" type="text" placeholder="🔍 搜索UID或是是昵称…" oninput="renderAllUsersRecords()" style="flex:1;background:#111;border:1px solid #2a4a6a;border-radius:8px;color:#fff;font-size:13px;padding:8px 12px;outline:none;">
-    <button onclick="document.getElementById(&#39;uidSearch&#39;).value=&#39;&#39;;renderAllUsersRecords();" style="background:#1a1a2e;border:1px solid #444;border-radius:8px;color:#888;font-size:12px;padding:8px 10px;cursor:pointer;">✕ 清空</button>
+    <input id="uidSearch" type="text" placeholder="🔍 搜索UID或是是昵称…" oninput="renderAllUsersRecords()"
+      style="flex:1;background:#111;border:1px solid #2a4a6a;border-radius:8px;color:#fff;font-size:13px;padding:8px 12px;outline:none;">
+    <button onclick="document.getElementById('uidSearch').value='';renderAllUsersRecords();"
+      style="background:#1a1a2e;border:1px solid #444;border-radius:8px;color:#888;font-size:12px;padding:8px 10px;cursor:pointer;">✕ 清空</button>
   </div>
   <!-- 操作按钮行 -->
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
-    <button onclick="exportRecords()" style="background:#0d2a1a;border:1px solid #52c41a66;border-radius:8px;color:#52c41a;font-size:12px;padding:7px 14px;cursor:pointer;">📤 导出备份</button>
+    <button onclick="exportRecords()"
+      style="background:#0d2a1a;border:1px solid #52c41a66;border-radius:8px;color:#52c41a;font-size:12px;padding:7px 14px;cursor:pointer;">📤 导出备份</button>
     <label style="background:#0d1a2e;border:1px solid #1890ff66;border-radius:8px;color:#1890ff;font-size:12px;padding:7px 14px;cursor:pointer;">
       📥 导入复原
       <input type="file" accept=".json" onchange="importRecords(this)" style="display:none;">
     </label>
-    <button onclick="clearSingleUID()" style="background:#1a1a0a;border:1px solid #faad1466;border-radius:8px;color:#faad14;font-size:12px;padding:7px 14px;cursor:pointer;">🧹 清除指定UID</button>
-    <button onclick="clearAllRecords()" style="background:#1a0a0a;border:1px solid #ff4d4f66;border-radius:8px;color:#ff4d4f;font-size:12px;padding:7px 14px;cursor:pointer;">🗑️ 清除全部记录</button>
-    <button onclick="showManualAdd()" style="background:#1a0a2e;border:1px solid #b37feb88;border-radius:8px;color:#b37feb;font-size:12px;padding:7px 14px;cursor:pointer;">📝 手动登记奖励</button>
+    <button onclick="clearSingleUID()"
+      style="background:#1a1a0a;border:1px solid #faad1466;border-radius:8px;color:#faad14;font-size:12px;padding:7px 14px;cursor:pointer;">🧹 清除指定UID</button>
+    <button onclick="clearAllRecords()"
+      style="background:#1a0a0a;border:1px solid #ff4d4f66;border-radius:8px;color:#ff4d4f;font-size:12px;padding:7px 14px;cursor:pointer;">🗑️ 清除全部记录</button>
+    <button onclick="showManualAdd()"
+      style="background:#1a0a2e;border:1px solid #b37feb88;border-radius:8px;color:#b37feb;font-size:12px;padding:7px 14px;cursor:pointer;">📝 手动登记奖励</button>
   </div>
   <div id="allUsersRecords"></div>
 </div>
@@ -583,11 +589,13 @@
     <p style="color:#888;font-size:12px;margin-bottom:16px;">用户截图发群后，在此登记到管理端记录</p>
     <div style="margin-bottom:12px;">
       <label style="color:#aaa;font-size:12px;display:block;margin-bottom:4px;">用户 UID（纯数字）</label>
-      <input id="manualUID" type="text" placeholder="例：76175051568852992" style="width:100%;background:#0d0d1a;border:1px solid #444;border-radius:8px;color:#fff;font-size:14px;padding:9px 12px;outline:none;">
+      <input id="manualUID" type="text" placeholder="例：76175051568852992"
+        style="width:100%;background:#0d0d1a;border:1px solid #444;border-radius:8px;color:#fff;font-size:14px;padding:9px 12px;outline:none;">
     </div>
     <div style="margin-bottom:16px;">
       <label style="color:#aaa;font-size:12px;display:block;margin-bottom:4px;">开奖日期</label>
-      <input id="manualDate" type="date" style="width:100%;background:#0d0d1a;border:1px solid #444;border-radius:8px;color:#fff;font-size:14px;padding:9px 12px;outline:none;">
+      <input id="manualDate" type="date"
+        style="width:100%;background:#0d0d1a;border:1px solid #444;border-radius:8px;color:#fff;font-size:14px;padding:9px 12px;outline:none;">
     </div>
     <div id="manualPreview" style="display:none;background:#0d1828;border:1px solid #1e3a5a;border-radius:8px;padding:10px;margin-bottom:14px;font-size:13px;">
       <span style="color:#aaa;">该日期奖励预测：</span>
@@ -595,8 +603,10 @@
     </div>
     <div id="manualAddMsg" style="display:none;font-size:12px;padding:6px 10px;border-radius:6px;margin-bottom:10px;"></div>
     <div style="display:flex;gap:10px;">
-      <button onclick="doManualAdd()" style="flex:1;background:#2a1050;border:1px solid #b37feb;border-radius:8px;color:#b37feb;font-size:13px;padding:9px;cursor:pointer;font-weight:bold;">✅ 确认登记</button>
-      <button onclick="closeManualAdd()" style="flex:1;background:#1a1a2e;border:1px solid #444;border-radius:8px;color:#888;font-size:13px;padding:9px;cursor:pointer;">取消</button>
+      <button onclick="doManualAdd()"
+        style="flex:1;background:#2a1050;border:1px solid #b37feb;border-radius:8px;color:#b37feb;font-size:13px;padding:9px;cursor:pointer;font-weight:bold;">✅ 确认登记</button>
+      <button onclick="closeManualAdd()"
+        style="flex:1;background:#1a1a2e;border:1px solid #444;border-radius:8px;color:#888;font-size:13px;padding:9px;cursor:pointer;">取消</button>
     </div>
   </div>
 </div>
@@ -607,7 +617,9 @@
     <h3>🔓 输入解锁码</h3>
     <p id="modalDesc">发当天交易截图给管理员<br>收到4位解锁码后在这里输入</p>
     <div class="code-input-wrap">
-      <input type="text" id="codeInput" maxlength="4" placeholder="0000" oninput="this.value=this.value.replace(/[^0-9]/g,&#39;&#39;)" onkeydown="if(event.key===&#39;Enter&#39;)doUnlock()">
+      <input type="text" id="codeInput" maxlength="4" placeholder="0000"
+             oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+             onkeydown="if(event.key==='Enter')doUnlock()">
     </div>
     <div class="code-error" id="codeError" style="display:none;">❌ 解锁码错误，请重新输入</div>
     <button class="btn-unlock" onclick="doUnlock()">确认解锁 🔓</button>
@@ -658,10 +670,10 @@ const PRIZES = [
 
 // ===== 工具函数 =====
 function hashStr(str) {
-  let h = 2166136261;
+  let h = 2166136261 >>> 0;
   for (let i = 0; i < str.length; i++) {
     h ^= str.charCodeAt(i);
-    h = (h * 16777619) >>> 0;
+    h = Math.imul(h, 16777619) >>> 0;
   }
   return h;
 }
@@ -715,26 +727,10 @@ window.onload = function() {
     const mm = String(now.getMonth()+1).padStart(2,'0');
     const dd = String(now.getDate()).padStart(2,'0');
     document.getElementById('adminDate').value = `${now.getFullYear()}-${mm}-${dd}`;
-    // 管理员模式：显示UID输入区域
-    document.getElementById('nameSection').style.display = 'block';
-  } else {
-    // 普通用户模式：隐藏输入区域，直接进入日历
-    document.getElementById('nameSection').style.display = 'none';
   }
   const params = new URLSearchParams(location.search);
-  const uid = params.get('u');
-  if (uid) {
-    // URL中有UID参数，直接加载
-    document.getElementById('nameInput').value = uid;
-    confirmName();
-  } else if (!isAdmin) {
-    // 没有UID参数且非管理员：生成一个基于设备的匿名ID，直接进入日历
-    let anonId = localStorage.getItem('okx_anon_uid');
-    if (!anonId) {
-      anonId = 'guest_' + Math.floor(Math.random() * 9000000000 + 1000000000);
-      localStorage.setItem('okx_anon_uid', anonId);
-    }
-    document.getElementById('nameInput').value = anonId;
+  if (params.get('u')) {
+    document.getElementById('nameInput').value = params.get('u');
     confirmName();
   }
 };
@@ -743,16 +739,8 @@ function confirmName() {
   const val = document.getElementById('nameInput').value.trim();
   if (!val) { alert('请输入你的OKX UID（纯数字）'); return; }
   currentUser = val;
-  
-  // 判断是否是匿名用户
-  const isAnon = val.startsWith('guest_');
-  const displayUID = isAnon ? '访客模式' : val;
-  
-  document.getElementById('badgeName').textContent = displayUID;
+  document.getElementById('badgeName').textContent = val;
   document.getElementById('userBadge').style.display = 'block';
-  // 仅管理员模式显示"更改"按钮
-  const changeBtnWrap = document.getElementById('changeBtnWrap');
-  if (changeBtnWrap) changeBtnWrap.style.display = isAdmin ? 'inline' : 'none';
   document.getElementById('nameInput').style.display = 'none';
   document.querySelector('.name-box button').style.display = 'none';
   document.querySelector('.name-box label').textContent = '';
@@ -1234,6 +1222,5 @@ function generateCode() {
   document.getElementById('adminResult').style.display = 'block';
 }
 </script>
-
-
-</body></html>
+</body>
+</html>
