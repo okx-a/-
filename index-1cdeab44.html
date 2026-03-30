@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>OKX 交易日历抽奖</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0d0d1a;
+    color: #e0e0e0;
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ===== 顶部 ===== */
+  .header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid #333;
+  }
+  .header h1 {
+    font-size: 22px;
+    color: #ffd700;
+    letter-spacing: 1px;
+  }
+  .header p { font-size: 13px; color: #888; margin-top: 4px; }
+
+  /* ===== 昵称输入 ===== */
+  .name-section {
+    padding: 20px;
+    text-align: center;
+  }
+  .name-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #1a1a2e;
+    border: 1px solid #444;
+    border-radius: 12px;
+    padding: 12px 16px;
+  }
+  .name-box label { font-size: 14px; color: #aaa; white-space: nowrap; }
+  .name-box input {
+    background: #111;
+    border: 1px solid #555;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 15px;
+    padding: 8px 12px;
+    width: 160px;
+    outline: none;
+  }
+  .name-box input:focus { border-color: #ffd700; }
+  .name-box button {
+    background: linear-gradient(135deg, #ffd700, #ffaa00);
+    border: none;
+    border-radius: 8px;
+    color: #000;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 8px 18px;
+    cursor: pointer;
+  }
+  .name-box button:hover { opacity: 0.9; }
+
+  .user-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #1a2a1a;
+    border: 1px solid #2a4a2a;
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 13px;
+    color: #52c41a;
+    margin-top: 10px;
+  }
+
+  /* ===== 统计条 ===== */
+  .stats-bar {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 10px 20px;
+    flex-wrap: wrap;
+  }
+  .stat-item {
+    background: #1a1a2e;
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 10px 20px;
+    text-align: center;
+    min-width: 100px;
+  }
+  .stat-num { font-size: 22px; font-weight: bold; color: #ffd700; }
+  .stat-label { font-size: 11px; color: #888; margin-top: 2px; }
+
+  /* ===== 日历 ===== */
+  .calendar-wrap {
+    padding: 0 16px 20px;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+  .cal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 4px;
+  }
+  .cal-title { font-size: 17px; font-weight: bold; color: #fff; }
+  .cal-nav button {
+    background: #333;
+    border: none;
+    border-radius: 6px;
+    color: #aaa;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px 12px;
+  }
+  .cal-nav button:hover { background: #444; color: #fff; }
+
+  .weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+  .weekday {
+    text-align: center;
+    font-size: 12px;
+    color: #666;
+    padding: 4px 0;
+  }
+
+  .days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+  }
+
+  .day-cell {
+    aspect-ratio: 1;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: default;
+    font-size: 13px;
+  }
+  .day-cell.empty { background: transparent; }
+
+  /* 未开锁的日期 */
+  .day-cell.locked {
+    background: #1a1a2e;
+    border: 1px solid #2a2a3e;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .day-cell.locked:hover { border-color: #ffd700; transform: scale(1.05); }
+  .day-cell.locked .day-num { font-size: 12px; color: #555; }
+  .day-cell.locked .gift-icon { font-size: 22px; }
+
+  /* 今天的日期高亮 */
+  .day-cell.today { border-color: #1890ff !important; }
+  .day-cell.today .day-num { color: #1890ff !important; }
+
+  /* 已开锁的日期 */
+  .day-cell.unlocked {
+    background: #1a2a1a;
+    border: 2px solid #52c41a;
+    cursor: default;
+    animation: unlockPop 0.4s ease;
+  }
+  .day-cell.unlocked .day-num { font-size: 10px; color: #52c41a; }
+  .day-cell.unlocked .prize-mini {
+    font-size: 9px;
+    color: #52c41a;
+    text-align: center;
+    line-height: 1.2;
+    padding: 0 2px;
+  }
+
+  /* 活动前日期（不可点击）*/
+  .day-cell.past {
+    background: #111;
+    border: 1px solid #1e1e1e;
+    cursor: not-allowed;
+    opacity: 0.3;
+  }
+  .day-cell.past .day-num { color: #333; }
+
+  /* 活动后、今日前：可补领 */
+  .day-cell.past-active {
+    background: #111a11;
+    border: 1px solid #2a3a2a;
+    cursor: pointer;
+    opacity: 0.65;
+    transition: all 0.2s;
+  }
+  .day-cell.past-active:hover { opacity: 0.9; border-color: #52c41a; transform: scale(1.03); }
+  .day-cell.past-active .day-num { color: #4a6a4a; font-size: 11px; }
+  .day-cell.past-active .gift-icon { font-size: 18px; }
+
+  @keyframes unlockPop {
+    0% { transform: scale(0.5); opacity: 0; }
+    70% { transform: scale(1.15); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* ===== 奖励规则 ===== */
+  .rules-section {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 0 16px 20px;
+  }
+  .rules-title {
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .rules-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .rule-item {
+    background: #1a1a2e;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+  .rule-days { color: #ffd700; font-weight: bold; font-size: 13px; }
+  .rule-reward { color: #52c41a; margin-top: 2px; }
+
+  /* ===== 解锁模态框 ===== */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: #1a1a2e;
+    border: 1px solid #444;
+    border-radius: 16px;
+    padding: 28px 24px;
+    width: 300px;
+    text-align: center;
+    position: relative;
+  }
+  .modal h3 { color: #ffd700; font-size: 18px; margin-bottom: 6px; }
+  .modal p { color: #888; font-size: 13px; margin-bottom: 16px; line-height: 1.6; }
+  .code-input-wrap {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+  .code-input-wrap input {
+    width: 130px;
+    background: #111;
+    border: 2px solid #555;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 22px;
+    text-align: center;
+    padding: 10px;
+    letter-spacing: 6px;
+    outline: none;
+  }
+  .code-input-wrap input:focus { border-color: #ffd700; }
+  .modal .btn-unlock {
+    background: linear-gradient(135deg, #52c41a, #389e0d);
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: bold;
+    padding: 12px 30px;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  .modal .btn-cancel {
+    background: #333;
+    border: none;
+    border-radius: 10px;
+    color: #888;
+    font-size: 13px;
+    padding: 8px 20px;
+    cursor: pointer;
+    width: 100%;
+  }
+  .code-error { color: #ff4d4f; font-size: 12px; margin-top: -10px; margin-bottom: 10px; }
+
+  /* ===== 奖励揭示动画 ===== */
+  .prize-reveal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  .prize-reveal-overlay.show { display: flex; }
+  .prize-box {
+    background: linear-gradient(135deg, #1a2a1a, #0d1a0d);
+    border: 2px solid #52c41a;
+    border-radius: 20px;
+    padding: 40px 50px;
+    text-align: center;
+    animation: prizeReveal 0.5s ease;
+  }
+  @keyframes prizeReveal {
+    0% { transform: scale(0.3) rotate(-10deg); opacity: 0; }
+    60% { transform: scale(1.1) rotate(3deg); }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+  .prize-emoji { font-size: 64px; margin-bottom: 12px; display: block; }
+  .prize-date-label { font-size: 13px; color: #888; margin-bottom: 6px; }
+  .prize-name { font-size: 28px; font-weight: bold; color: #52c41a; margin-bottom: 6px; }
+  .prize-subtitle { font-size: 14px; color: #aaa; margin-bottom: 20px; }
+  .prize-confirm {
+    background: linear-gradient(135deg, #52c41a, #389e0d);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 14px 40px;
+    cursor: pointer;
+  }
+  .confetti-wrap {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 1999;
+  }
+  .confetti-piece {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    top: -20px;
+    animation: confettiFall linear forwards;
+    border-radius: 2px;
+  }
+  @keyframes confettiFall {
+    to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* ===== 已开奖列表 ===== */
+  .unlocked-list {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 0 16px 30px;
+  }
+  .unlocked-title { font-size: 15px; color: #e0e0e0; font-weight: bold; margin-bottom: 12px; }
+  .unlocked-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: #1a1a2e;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    font-size: 13px;
+    border-left: 3px solid #52c41a;
+  }
+  .unlocked-item .date-tag { color: #bbb; }
+  .unlocked-item .prize-tag { color: #52c41a; font-weight: bold; }
+
+  /* ===== 管理员用户记录区块 ===== */
+  .admin-all-records {
+    max-width: 900px;
+    margin: 0 auto 20px;
+    padding: 16px 20px;
+    background: #080f1a;
+    border: 1px solid #ffd70033;
+    border-radius: 14px;
+  }
+
+  /* ===== 管理员面板 ===== */
+  .admin-panel {
+    display: none;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 16px;
+    background: #0a0a1a;
+    border: 1px solid #ff4d4f44;
+    border-radius: 12px;
+    margin-bottom: 20px;
+  }
+  .admin-panel h3 { color: #ff4d4f; font-size: 15px; margin-bottom: 12px; }
+  .admin-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .admin-row input, .admin-row select {
+    background: #111;
+    border: 1px solid #444;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    padding: 8px 12px;
+    flex: 1;
+    min-width: 100px;
+    outline: none;
+  }
+  .admin-row button {
+    background: #ff4d4f;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+  .admin-result {
+    background: #1a0a0a;
+    border: 1px solid #ff4d4f33;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 14px;
+    color: #fff;
+  }
+  .admin-code { font-size: 28px; color: #ff4d4f; font-weight: bold; letter-spacing: 6px; }
+  .admin-prize { font-size: 14px; color: #aaa; margin-top: 4px; }
+
+  /* ===== 提示 ===== */
+  .hint-banner {
+    max-width: 520px;
+    margin: 0 auto 16px;
+    padding: 0 16px;
+  }
+  .hint-box {
+    background: #0a1628;
+    border: 1px solid #1890ff33;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 12px;
+    color: #888;
+    line-height: 1.8;
+  }
+  .hint-box strong { color: #1890ff; }
+</style>
+</head>
+<body>
+
+<!-- 顶部标题 -->
+<div class="header">
+  <h1>🎯 OKX 交易日历奖励<span id="adminBadge" style="display:none;margin-left:8px;background:#ff4d4f;color:#fff;font-size:11px;padding:2px 8px;border-radius:10px;vertical-align:middle;">🔐 管理专属</span></h1>
+  <p>每天交易·每天开奖·每人专属</p>
+</div>
+
+<!-- 昵称输入区 -->
+<div class="name-section" id="nameSection">
+  <div class="name-box">
+    <label>我的UID</label>
+    <input type="text" id="nameInput" placeholder="输入UID（纯数字）" maxlength="20">
+    <button onclick="confirmName()">确认</button>
+  </div>
+  <div id="userBadge" style="display:none;margin-top:10px;">
+    <div class="user-badge">
+      <span>✅ 已确认：</span>
+      <span id="badgeName" style="font-weight:bold;color:#ffd700;"></span>
+      <span onclick="changeName()" style="cursor:pointer;color:#555;font-size:11px;">更改</span>
+    </div>
+  </div>
+</div>
+
+<!-- 管理员面板（隐藏，URL加 ?admin=1 开启） -->
+<div class="admin-panel" id="adminPanel">
+  <h3>🔐 管理员工具 · 生成解锁码</h3>
+  <div class="admin-row">
+    <input type="text" id="adminUser" placeholder="用户UID（纯数字）" style="flex:2;">
+    <input type="date" id="adminDate" style="color-scheme:dark;" style="flex:2;">
+    <button onclick="generateCode()">查询解锁码 + 奖励预览</button>
+  </div>
+  <div class="admin-result" id="adminResult" style="display:none;">
+    <div>用户 <strong id="resUser" style="color:#ffd700;"></strong> · <span id="resDate"></span></div>
+    <div class="admin-code" id="resCode"></div>
+    <div class="admin-prize" id="resPrize"></div>
+  </div>
+
+</div>
+
+<!-- 统计条 -->
+<div class="stats-bar" id="statsBar" style="display:none;">
+  <div class="stat-item">
+    <div class="stat-num" id="statDays">0</div>
+    <div class="stat-label">已开奖天数</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num" id="statValue">0U</div>
+    <div class="stat-label">累计奖励</div>
+  </div>
+</div>
+
+<!-- 使用说明 -->
+<div class="hint-banner" id="hintBanner" style="display:none;">
+  <div class="hint-box">
+    <strong>📌 如何获得解锁码？</strong><br>
+    发当天交易截图到群里 → 管理员核实后发给你<strong>4位解锁码</strong> → 点击对应日期输入解锁 → 奖励自动揭晓
+    <br><span style="color:#52c41a;">💡 支持补领：若管理员未能及时回复，第二天补发解锁码同样有效</span>
+  </div>
+</div>
+
+<!-- 日历 -->
+<div class="calendar-wrap" id="calendarWrap" style="display:none;">
+  <div class="cal-header">
+    <div class="cal-nav">
+      <button onclick="prevMonth()">‹</button>
+    </div>
+    <div class="cal-title" id="calTitle"></div>
+    <div class="cal-nav">
+      <button onclick="nextMonth()">›</button>
+    </div>
+  </div>
+  <div class="weekdays">
+    <div class="weekday">日</div><div class="weekday">一</div>
+    <div class="weekday">二</div><div class="weekday">三</div>
+    <div class="weekday">四</div><div class="weekday">五</div>
+    <div class="weekday">六</div>
+  </div>
+  <div class="days-grid" id="daysGrid"></div>
+</div>
+
+
+<!-- 已开奖列表 -->
+<div class="unlocked-list" id="unlockedList" style="display:none;">
+  <div class="unlocked-title" id="unlockedListTitle">📋 我的开奖记录</div>
+  <div id="unlockedItems"></div>
+</div>
+
+<!-- 管理员用户开奖记录（仅管理员可见） -->
+<div class="admin-all-records" id="adminAllRecords" style="display:none;">
+  <!-- 标题行 -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+    <span style="color:#ffd700;font-size:15px;font-weight:bold;">📋 用户开奖记录</span>
+    <button onclick="renderAllUsersRecords()" style="background:#1a3a5a;border:1px solid #1890ff;border-radius:6px;color:#1890ff;font-size:12px;padding:5px 12px;cursor:pointer;">↻ 刷新</button>
+  </div>
+  <!-- UID搜索栏 -->
+  <div style="display:flex;gap:8px;margin-bottom:10px;">
+    <input id="uidSearch" type="text" placeholder="🔍 搜索UID或是是昵称…" oninput="renderAllUsersRecords()"
+      style="flex:1;background:#111;border:1px solid #2a4a6a;border-radius:8px;color:#fff;font-size:13px;padding:8px 12px;outline:none;">
+    <button onclick="document.getElementById('uidSearch').value='';renderAllUsersRecords();"
+      style="background:#1a1a2e;border:1px solid #444;border-radius:8px;color:#888;font-size:12px;padding:8px 10px;cursor:pointer;">✕ 清空</button>
+  </div>
+  <!-- 操作按钮行 -->
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+    <button onclick="exportRecords()"
+      style="background:#0d2a1a;border:1px solid #52c41a66;border-radius:8px;color:#52c41a;font-size:12px;padding:7px 14px;cursor:pointer;">📤 导出备份</button>
+    <label style="background:#0d1a2e;border:1px solid #1890ff66;border-radius:8px;color:#1890ff;font-size:12px;padding:7px 14px;cursor:pointer;">
+      📥 导入复原
+      <input type="file" accept=".json" onchange="importRecords(this)" style="display:none;">
+    </label>
+    <button onclick="clearSingleUID()"
+      style="background:#1a1a0a;border:1px solid #faad1466;border-radius:8px;color:#faad14;font-size:12px;padding:7px 14px;cursor:pointer;">🧹 清除指定UID</button>
+    <button onclick="clearAllRecords()"
+      style="background:#1a0a0a;border:1px solid #ff4d4f66;border-radius:8px;color:#ff4d4f;font-size:12px;padding:7px 14px;cursor:pointer;">🗑️ 清除全部记录</button>
+    <button onclick="showManualAdd()"
+      style="background:#1a0a2e;border:1px solid #b37feb88;border-radius:8px;color:#b37feb;font-size:12px;padding:7px 14px;cursor:pointer;">📝 手动登记奖励</button>
+  </div>
+  <div id="allUsersRecords"></div>
+</div>
+
+<!-- 手动登记奖励模态框 -->
+<div id="manualAddModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#131929;border:1px solid #b37feb88;border-radius:16px;padding:24px;width:90%;max-width:360px;box-shadow:0 8px 32px rgba(0,0,0,0.6);">
+    <h3 style="color:#b37feb;font-size:16px;margin-bottom:6px;">📝 手动登记用户奖励</h3>
+    <p style="color:#888;font-size:12px;margin-bottom:16px;">用户截图发群后，在此登记到管理端记录</p>
+    <div style="margin-bottom:12px;">
+      <label style="color:#aaa;font-size:12px;display:block;margin-bottom:4px;">用户 UID（纯数字）</label>
+      <input id="manualUID" type="text" placeholder="例：76175051568852992"
+        style="width:100%;background:#0d0d1a;border:1px solid #444;border-radius:8px;color:#fff;font-size:14px;padding:9px 12px;outline:none;">
+    </div>
+    <div style="margin-bottom:16px;">
+      <label style="color:#aaa;font-size:12px;display:block;margin-bottom:4px;">开奖日期</label>
+      <input id="manualDate" type="date"
+        style="width:100%;background:#0d0d1a;border:1px solid #444;border-radius:8px;color:#fff;font-size:14px;padding:9px 12px;outline:none;">
+    </div>
+    <div id="manualPreview" style="display:none;background:#0d1828;border:1px solid #1e3a5a;border-radius:8px;padding:10px;margin-bottom:14px;font-size:13px;">
+      <span style="color:#aaa;">该日期奖励预测：</span>
+      <span id="manualPreviewPrize" style="color:#52c41a;font-weight:bold;"></span>
+    </div>
+    <div id="manualAddMsg" style="display:none;font-size:12px;padding:6px 10px;border-radius:6px;margin-bottom:10px;"></div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="doManualAdd()"
+        style="flex:1;background:#2a1050;border:1px solid #b37feb;border-radius:8px;color:#b37feb;font-size:13px;padding:9px;cursor:pointer;font-weight:bold;">✅ 确认登记</button>
+      <button onclick="closeManualAdd()"
+        style="flex:1;background:#1a1a2e;border:1px solid #444;border-radius:8px;color:#888;font-size:13px;padding:9px;cursor:pointer;">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- 解锁输入模态框 -->
+<div class="modal-overlay" id="unlockModal">
+  <div class="modal">
+    <h3>🔓 输入解锁码</h3>
+    <p id="modalDesc">发当天交易截图给管理员<br>收到4位解锁码后在这里输入</p>
+    <div class="code-input-wrap">
+      <input type="text" id="codeInput" maxlength="4" placeholder="0000"
+             oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+             onkeydown="if(event.key==='Enter')doUnlock()">
+    </div>
+    <div class="code-error" id="codeError" style="display:none;">❌ 解锁码错误，请重新输入</div>
+    <button class="btn-unlock" onclick="doUnlock()">确认解锁 🔓</button>
+    <button class="btn-cancel" onclick="closeModal()">取消</button>
+  </div>
+</div>
+
+<!-- 奖励揭示 -->
+<div class="prize-reveal-overlay" id="prizeReveal">
+  <div class="confetti-wrap" id="confettiWrap"></div>
+  <div class="prize-box">
+    <span class="prize-emoji" id="revealEmoji">🎁</span>
+    <div class="prize-date-label" id="revealDate"></div>
+    <div class="prize-name" id="revealName"></div>
+    <div class="prize-subtitle" id="revealSub">恭喜获得！截图发到群里领取</div>
+    <div id="revealHongbaoTip" style="display:none;background:#2a1a0a;border:1px solid #ff8c00;border-radius:8px;padding:12px 16px;margin:8px 0 12px;font-size:13px;color:#ffa940;line-height:1.6;">
+      🎉 恭喜中得隐藏大奖！<br>请截图此页面，然后<strong style="color:#ffd700;">私信群主</strong>领取红包 🧧
+    </div>
+    <button class="prize-confirm" onclick="closePrizeReveal()">好的，截图发群里 🎉</button>
+  </div>
+</div>
+
+<script>
+// ===== 配置 =====
+const SALT = 'OKX_REWARD_2026';
+const ACTIVITY_START = '2026-03-17'; // 活动开始日期，可调整
+
+const PRIZES = [
+  // 高概率档：私信红包+小额USDT（合计~54.6%）
+  { name: '🧧 私信群主领取红包', emoji: '🧧', value: 0,   weight: 215, type:'hongbao', special: true },
+  { name: 'USDT 0.1U',                  emoji: '💰', value: 0.1, weight: 110, type:'usdt'    },
+  { name: 'USDT 0.2U',                  emoji: '💰', value: 0.2, weight: 90,  type:'usdt'    },
+  { name: 'USDT 0.3U',                  emoji: '💰', value: 0.3, weight: 68,  type:'usdt'    },
+  // 中等档：返佣卡1张（37.5%）
+  { name: '返佣卡 1张',         emoji: '🃏', value: 1,   weight: 375, type:'rebate'  },
+  // 中低档：高面值USDT（~11.8%）
+  { name: 'USDT 0.4U',                  emoji: '💰', value: 0.4, weight: 50,  type:'usdt'    },
+  { name: 'USDT 0.5U',                  emoji: '💰', value: 0.5, weight: 40,  type:'usdt'    },
+  { name: 'USDT 0.6U',                  emoji: '💰', value: 0.6, weight: 28,  type:'usdt'    },
+  // ===== 中下档 ~2.5% =====
+  { name: '体验金 2U',           emoji: '🎁', value: 2,   weight: 12,  type:'trial'   },
+  // ===== 极低档 ~0.3% each (30天内可领到1次) =====
+  { name: 'USDT 1U',            emoji: '💰', value: 1,   weight: 3,   type:'usdt'    },
+  { name: 'USDT 2U',            emoji: '💰', value: 2,   weight: 3,   type:'usdt'    },
+  { name: '体验金 4U',           emoji: '🎁', value: 4,   weight: 1,   type:'trial'   },
+  { name: '返佣卡 2张',          emoji: '🃏', value: 2,   weight: 5,   type:'rebate'  },
+];
+
+// ===== 工具函数 =====
+function hashStr(str) {
+  let h = 2166136261;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = (h * 16777619) >>> 0;
+  }
+  return h;
+}
+
+function getPrize(username, year, month, day) {
+  const key = `${username}_${year}_${month}_${day}`;
+  const hash = hashStr(key);
+  const total = PRIZES.reduce((s, p) => s + p.weight, 0);
+  const roll = hash % total;
+  let cum = 0;
+  for (const p of PRIZES) {
+    cum += p.weight;
+    if (roll < cum) return p;
+  }
+  return PRIZES[0];
+}
+
+function getUnlockCode(username, year, month, day) {
+  const key = `${username}_${year}_${month}_${day}_${SALT}`;
+  return (hashStr(key) % 10000).toString().padStart(4, '0');
+}
+
+function getStorageKey(username) {
+  return `okx_cal_${username.toLowerCase().trim()}`;
+}
+
+function loadUnlocked(username) {
+  try {
+    return JSON.parse(localStorage.getItem(getStorageKey(username)) || '{}');
+  } catch { return {}; }
+}
+
+function saveUnlocked(username, data) {
+  localStorage.setItem(getStorageKey(username), JSON.stringify(data));
+}
+
+// ===== 状态 =====
+let currentUser = '';
+let currentYear = new Date().getFullYear();
+let currentMonth = new Date().getMonth() + 1;
+let pendingDate = null;
+const isAdmin = new URLSearchParams(location.search).has('admin');
+
+// ===== 初始化 =====
+window.onload = function() {
+  if (isAdmin) {
+    document.getElementById('adminPanel').style.display = 'block';
+    const badge = document.getElementById('adminBadge');
+    if (badge) badge.style.display = 'inline';
+    const now = new Date();
+    const mm = String(now.getMonth()+1).padStart(2,'0');
+    const dd = String(now.getDate()).padStart(2,'0');
+    document.getElementById('adminDate').value = `${now.getFullYear()}-${mm}-${dd}`;
+  }
+  const params = new URLSearchParams(location.search);
+  if (params.get('u')) {
+    document.getElementById('nameInput').value = params.get('u');
+    confirmName();
+  }
+};
+
+function confirmName() {
+  const val = document.getElementById('nameInput').value.trim();
+  if (!val) { alert('请输入你的OKX UID（纯数字）'); return; }
+  currentUser = val;
+  document.getElementById('badgeName').textContent = val;
+  document.getElementById('userBadge').style.display = 'block';
+  document.getElementById('nameInput').style.display = 'none';
+  document.querySelector('.name-box button').style.display = 'none';
+  document.querySelector('.name-box label').textContent = '';
+
+  document.getElementById('statsBar').style.display = 'flex';
+  document.getElementById('calendarWrap').style.display = 'block';
+  document.getElementById('hintBanner').style.display = 'block';
+  document.getElementById('unlockedList').style.display = 'block';
+  if (isAdmin) document.getElementById('adminAllRecords').style.display = 'block';
+
+  renderCalendar();
+  updateStats();
+  renderUnlockedList();
+  if (isAdmin) renderAllUsersRecords();
+}
+
+function changeName() {
+  currentUser = '';
+  document.getElementById('nameInput').style.display = '';
+  document.querySelector('.name-box button').style.display = '';
+  document.getElementById('userBadge').style.display = 'none';
+  document.getElementById('statsBar').style.display = 'none';
+  document.getElementById('calendarWrap').style.display = 'none';
+  document.getElementById('hintBanner').style.display = 'none';
+  document.getElementById('unlockedList').style.display = 'none';
+  document.getElementById('adminAllRecords').style.display = 'none';
+}
+
+// ===== 日历渲染 =====
+function renderCalendar() {
+  const months = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+  document.getElementById('calTitle').textContent = `${currentYear}年 ${months[currentMonth-1]}`;
+
+  const grid = document.getElementById('daysGrid');
+  grid.innerHTML = '';
+
+  const today = new Date();
+  const firstDay = new Date(currentYear, currentMonth - 1, 1).getDay();
+  const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+  const unlocked = loadUnlocked(currentUser);
+
+  // 空格
+  for (let i = 0; i < firstDay; i++) {
+    const empty = document.createElement('div');
+    empty.className = 'day-cell empty';
+    grid.appendChild(empty);
+  }
+
+  // 日期
+  for (let d = 1; d <= daysInMonth; d++) {
+    const cell = document.createElement('div');
+    const dateKey = `${currentYear}_${currentMonth}_${d}`;
+    const isToday = (today.getFullYear() === currentYear && today.getMonth()+1 === currentMonth && today.getDate() === d);
+    const isPast = new Date(currentYear, currentMonth-1, d) < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const actStart = new Date(ACTIVITY_START);
+    const thisDate = new Date(currentYear, currentMonth-1, d);
+    const beforeActivity = thisDate < actStart;
+
+    if (unlocked[dateKey]) {
+      const prize = getPrize(currentUser, currentYear, currentMonth, d);
+      cell.className = 'day-cell unlocked';
+      cell.innerHTML = `<span class="day-num">${d}日</span><span class="prize-mini">${prize.emoji}<br>${prize.name.split(' ')[0]}</span>`;
+    } else if (beforeActivity) {
+      cell.className = 'day-cell past';
+      cell.innerHTML = `<span class="day-num">${d}</span>`;
+    } else if (isPast && !isToday) {
+      // 活动期内已过期日期：可补领
+      cell.className = 'day-cell past-active';
+      cell.innerHTML = `<span class="gift-icon">🎁</span><span class="day-num">${d}日</span>`;
+      cell.onclick = () => openUnlockModal(d);
+    } else {
+      cell.className = 'day-cell locked' + (isToday ? ' today' : '');
+      cell.innerHTML = `<span class="gift-icon">🎁</span><span class="day-num">${d}</span>`;
+      cell.onclick = () => openUnlockModal(d);
+    }
+    grid.appendChild(cell);
+  }
+}
+
+function goToday() {
+  const now = new Date();
+  currentYear = now.getFullYear();
+  currentMonth = now.getMonth() + 1;
+  renderCalendar();
+}
+function prevMonth() {
+  const actStart = new Date(ACTIVITY_START);
+  const prevY = currentMonth === 1 ? currentYear - 1 : currentYear;
+  const prevM = currentMonth === 1 ? 12 : currentMonth - 1;
+  // 不允许导航到活动开始前的月份
+  if (new Date(prevY, prevM - 1, 28) < new Date(actStart.getFullYear(), actStart.getMonth(), 1)) return;
+  currentMonth = prevM; currentYear = prevY;
+  renderCalendar();
+}
+function nextMonth() {
+  // 允许查看未来3个月（活动持续运营）
+  const now = new Date();
+  const futureLimit = new Date(now.getFullYear(), now.getMonth() + 3, 1);
+  const nextDate = new Date(currentYear, currentMonth, 1); // currentMonth already 1-indexed
+  if (nextDate >= futureLimit) return;
+  currentMonth++;
+  if (currentMonth > 12) { currentMonth = 1; currentYear++; }
+  renderCalendar();
+}
+
+// ===== 解锁逻辑 =====
+function openUnlockModal(day) {
+  pendingDate = { year: currentYear, month: currentMonth, day };
+  const dateStr = `${currentYear}年${currentMonth}月${day}日`;
+  const today = new Date();
+  const isToday = (today.getFullYear()===currentYear && today.getMonth()+1===currentMonth && today.getDate()===day);
+  const desc = isToday
+    ? `<strong style="color:#ffd700">${dateStr}</strong><br>发今天的交易截图给管理员<br>收到4位解锁码后在这里输入`
+    : `<strong style="color:#ffd700">${dateStr}</strong><br>⏪ 补领历史奖励<br>输入管理员发给你的<strong style="color:#ffd700;">${dateStr}补发解锁码</strong>`;
+  document.getElementById('modalDesc').innerHTML = desc;
+  document.getElementById('codeInput').value = '';
+  document.getElementById('codeError').style.display = 'none';
+  document.getElementById('unlockModal').classList.add('show');
+  setTimeout(() => document.getElementById('codeInput').focus(), 100);
+  // 更新解锁按钮文字
+  document.querySelector('#unlockModal .btn-unlock').textContent = isToday ? '确认解锁 🔓' : '补领解锁 🔓';
+}
+
+function closeModal() {
+  document.getElementById('unlockModal').classList.remove('show');
+  pendingDate = null;
+}
+
+function doUnlock() {
+  if (!pendingDate) return;
+  const entered = document.getElementById('codeInput').value.trim();
+  const correct = getUnlockCode(currentUser, pendingDate.year, pendingDate.month, pendingDate.day);
+
+  if (entered !== correct) {
+    document.getElementById('codeError').style.display = 'block';
+    document.getElementById('codeInput').value = '';
+    document.getElementById('codeInput').focus();
+    // 抖动效果
+    document.getElementById('codeInput').style.animation = 'none';
+    document.getElementById('codeInput').offsetHeight;
+    return;
+  }
+
+  // 正确！先保存日期，再关弹窗（closeModal会把pendingDate置null）
+  const { year: uYear, month: uMonth, day: uDay } = pendingDate;
+  const unlocked = loadUnlocked(currentUser);
+  const dateKey = `${uYear}_${uMonth}_${uDay}`;
+  unlocked[dateKey] = { ts: Date.now(), uid: currentUser };
+  saveUnlocked(currentUser, unlocked);
+
+  closeModal();
+
+  // 显示奖励弹窗+彩蛋动画
+  const prize = getPrize(currentUser, uYear, uMonth, uDay);
+  const dateStr = `${uYear}年${uMonth}月${uDay}日`;
+  showPrizeReveal(prize, dateStr);
+
+  // 刷新页面数据
+  renderCalendar();
+  updateStats();
+  renderUnlockedList();
+  if (isAdmin) renderAllUsersRecords();
+}
+
+// ===== 奖励揭示 =====
+function showPrizeReveal(prize, dateStr) {
+  document.getElementById('revealEmoji').textContent = prize.emoji;
+  document.getElementById('revealDate').textContent = dateStr + ' 开奖';
+  document.getElementById('revealName').textContent = prize.name;
+  // 红包大奖特殊提示
+  const tip = document.getElementById('revealHongbaoTip');
+  const sub = document.getElementById('revealSub');
+  if (prize.special) {
+    tip.style.display = 'block';
+    sub.style.display = 'none';
+  } else {
+    tip.style.display = 'none';
+    sub.style.display = 'block';
+  }
+  document.getElementById('prizeReveal').classList.add('show');
+  launchConfetti();
+}
+
+function closePrizeReveal() {
+  document.getElementById('prizeReveal').classList.remove('show');
+  document.getElementById('confettiWrap').innerHTML = '';
+}
+
+function launchConfetti() {
+  const colors = ['#ffd700','#52c41a','#1890ff','#ff4d4f','#faad14','#722ed1'];
+  const wrap = document.getElementById('confettiWrap');
+  wrap.innerHTML = '';
+  for (let i = 0; i < 60; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.cssText = `
+      left: ${Math.random()*100}vw;
+      background: ${colors[Math.floor(Math.random()*colors.length)]};
+      width: ${6+Math.random()*8}px;
+      height: ${6+Math.random()*8}px;
+      animation-duration: ${1.5+Math.random()*2}s;
+      animation-delay: ${Math.random()*0.5}s;
+      border-radius: ${Math.random()>0.5?'50%':'2px'};
+    `;
+    wrap.appendChild(p);
+  }
+}
+
+// ===== 统计 =====
+function updateStats() {
+  const unlocked = loadUnlocked(currentUser);
+  const keys = Object.keys(unlocked);
+  let totalValue = 0;
+  keys.forEach(k => {
+    const [y, m, d] = k.split('_').map(Number);
+    totalValue += getPrize(currentUser, y, m, d).value;
+  });
+  document.getElementById('statDays').textContent = keys.length;
+  document.getElementById('statValue').textContent = totalValue.toFixed(1) + 'U';
+}
+
+function renderUnlockedList() {
+  const unlocked = loadUnlocked(currentUser);
+  const keys = Object.keys(unlocked).sort().reverse();
+  const container = document.getElementById('unlockedItems');
+  if (keys.length === 0) {
+    container.innerHTML = '<div style="color:#888;font-size:12px;text-align:center;padding:12px;">暂无开奖记录，将交易截图发给管理员获取解锁码 🔗</div>';
+    return;
+  }
+  // Stats header
+  const sortedKeys = [...keys].sort();
+  const first = sortedKeys[0].replace(/_/g,'/');
+  const last = sortedKeys[sortedKeys.length-1].replace(/_/g,'/');
+  let totalVal = 0;
+  keys.forEach(k => {
+    const [y,m,d] = k.split('_').map(Number);
+    totalVal += getPrize(currentUser, y, m, d).value;
+  });
+  const statsHtml = `<div style="display:flex;justify-content:space-between;padding:8px 14px;background:#111a2a;border-radius:8px;margin-bottom:8px;font-size:12px;color:#bbb;">
+    <span>🏆 共开奖 <strong style="color:#ffd700;">${keys.length}</strong> 天</span>
+    <span>📅 ${first} — ${last}</span>
+    <span>💰 累计奖励值 <strong style="color:#52c41a;">${totalVal.toFixed(1)}U+</strong></span>
+  </div>`;
+  container.innerHTML = statsHtml + keys.map(k => {
+    const [y, m, d] = k.split('_').map(Number);
+    const prize = getPrize(currentUser, y, m, d);
+    const rec = unlocked[k];
+    let timeStr = '';
+    if (rec && rec.ts) {
+      const dt = new Date(rec.ts);
+      timeStr = `<span style="color:#aaa;font-size:11px;">⏱ ${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}</span>`;
+    }
+    const uidStr = (rec && rec.uid) ? `<span style="color:#aaa;font-size:11px;">UID: ${rec.uid}</span>` : '';
+    return `<div class="unlocked-item" style="flex-direction:column;align-items:flex-start;gap:4px;">
+      <div style="display:flex;justify-content:space-between;width:100%;">
+        <span class="date-tag">📅 ${y}年${m}月${d}日</span>
+        <span class="prize-tag">${prize.emoji} ${prize.name}</span>
+      </div>
+      <div style="display:flex;gap:12px;">${uidStr}${timeStr}</div>
+    </div>`;
+  }).join('');
+}
+
+// ===== 用户开奖记录总览（管理员用，甲乙丙栏）=====
+function renderAllUsersRecords() {
+  const container = document.getElementById('allUsersRecords');
+  if (!container) return;
+  const PREFIX = 'okx_cal_';
+  const searchEl = document.getElementById('uidSearch');
+  const keyword = searchEl ? searchEl.value.trim().toLowerCase() : '';
+  const uids = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith(PREFIX)) {
+      const uid = k.slice(PREFIX.length);
+      if (!keyword || uid.toLowerCase().includes(keyword)) uids.push(uid);
+    }
+  }
+  if (!uids.length) {
+    container.innerHTML = keyword
+      ? `<div style="color:#aaa;font-size:13px;text-align:center;padding:24px;">未找到匹配 "<strong style="color:#ffd700;">${keyword}</strong>" 的用户</div>`
+      : '<div style="color:#aaa;font-size:13px;text-align:center;padding:24px;">暂无用户开奖记录<br><span style="font-size:12px;color:#666;">用户在该设备解锁后自动显示</span></div>';
+    return;
+  }
+  uids.sort();
+  const cards = uids.map((uid, idx) => {
+    const unlocked = loadUnlocked(uid);
+    const keys = Object.keys(unlocked).sort();
+    if (!keys.length) return '';
+    let totalVal = 0;
+    const rows = keys.map(k => {
+      const [y,m,d] = k.split('_').map(Number);
+      const prize = getPrize(uid, y, m, d);
+      totalVal += prize.value || 0;
+      const rec = unlocked[k];
+      let timeStr = '';
+      if (rec && rec.ts) {
+        const dt = new Date(rec.ts);
+        timeStr = `${String(dt.getMonth()+1).padStart(2,'0')}/${String(dt.getDate()).padStart(2,'0')} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`;
+      }
+      return `<div style="background:#111c2e;border-radius:8px;padding:8px 10px;margin-bottom:6px;border-left:3px solid #52c41a;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="color:#ddd;font-size:12px;font-weight:bold;">📅 ${y}年${m}月${d}日</span>
+          <span style="color:#52c41a;font-size:13px;font-weight:bold;">${prize.emoji} ${prize.name}</span>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:4px;">
+          <span style="color:#aaa;font-size:11px;">UID: ${uid}</span>
+          ${timeStr ? `<span style="color:#888;font-size:11px;">⏱ ${timeStr}</span>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+    const displayUID = uid.length > 12 ? uid.slice(0,12) + '…' : uid;
+    return `<div style="background:#0d1828;border:1px solid #1e3a5a;border-radius:12px;padding:14px;display:flex;flex-direction:column;min-width:0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;padding-bottom:8px;border-bottom:2px solid #1e3a5a;">
+        <div>
+          <div style="color:#ffd700;font-weight:bold;font-size:13px;" title="${uid}">UID: ${displayUID}</div>
+          <div style="color:#52c41a;font-size:11px;margin-top:2px;">共 ${keys.length} 天 · ${totalVal.toFixed(1)}U+</div>
+        </div>
+      </div>
+      <div style="overflow-y:auto;max-height:280px;">${rows}</div>
+    </div>`;
+  }).filter(Boolean);
+  if (!cards.length) {
+    container.innerHTML = '<div style="color:#aaa;font-size:13px;text-align:center;padding:16px;">暂无记录</div>';
+    return;
+  }
+  container.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;">${cards.join('')}</div>`;
+}
+
+// ===== 管理员数据操作 =====
+
+// 导出所有用户记录为 JSON 备份文件
+function exportRecords() {
+  const PREFIX = 'okx_cal_';
+  const data = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith(PREFIX)) data[k] = localStorage.getItem(k);
+  }
+  if (!Object.keys(data).length) { alert('暂无记录可导出'); return; }
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const now = new Date();
+  a.href = url;
+  a.download = `okx_records_backup_${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// 导入 JSON 备份，复原记录（合并模式）
+function importRecords(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      let count = 0;
+      for (const [k, v] of Object.entries(data)) {
+        if (k.startsWith('okx_cal_')) { localStorage.setItem(k, v); count++; }
+      }
+      alert(`导入成功！共复原 ${count} 个用户记录`);
+      renderAllUsersRecords();
+    } catch { alert('文件格式错误，请确认是有效的备份 JSON 文件'); }
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// 清除指定 UID 的记录
+function clearSingleUID() {
+  const uid = prompt('请输入要清除的用户UID：');
+  if (!uid) return;
+  const key = 'okx_cal_' + uid.trim();
+  if (!localStorage.getItem(key)) { alert(`未找到 UID: ${uid.trim()} 的记录`); return; }
+  if (confirm(`确定清除 UID: ${uid.trim()} 的所有开奖记录？此操作不可撤销。`)) {
+    localStorage.removeItem(key);
+    alert('已清除');
+    renderAllUsersRecords();
+  }
+}
+
+// 清除全部用户记录
+function clearAllRecords() {
+  const PREFIX = 'okx_cal_';
+  const keys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith(PREFIX)) keys.push(k);
+  }
+  if (!keys.length) { alert('暂无记录'); return; }
+  if (!confirm(`⚠️ 确定清除全部 ${keys.length} 个用户的开奖记录？
+建议先点「导出备份」保存数据！
+此操作不可撤销。`)) return;
+  const confirmText = prompt('请输入 "CLEAR" 确认清除：');
+  if (confirmText !== 'CLEAR') { alert('输入错误，已取消'); return; }
+  keys.forEach(k => localStorage.removeItem(k));
+  alert(`已清除 ${keys.length} 个用户的所有记录`);
+  if (currentUser) renderUnlockedList();
+  renderAllUsersRecords();
+}
+
+// ===== 手动登记奖励 =====
+function showManualAdd() {
+  const modal = document.getElementById('manualAddModal');
+  modal.style.display = 'flex';
+  // 默认日期为今天
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth()+1).padStart(2,'0');
+  const dd = String(now.getDate()).padStart(2,'0');
+  document.getElementById('manualDate').value = `${yyyy}-${mm}-${dd}`;
+  document.getElementById('manualUID').value = '';
+  document.getElementById('manualPreview').style.display = 'none';
+  document.getElementById('manualAddMsg').style.display = 'none';
+  // 监听日期/UID变化自动预览奖励
+  ['manualUID','manualDate'].forEach(id => {
+    document.getElementById(id).oninput = updateManualPreview;
+  });
+  updateManualPreview();
+}
+function updateManualPreview() {
+  const uid = document.getElementById('manualUID').value.trim();
+  const dateVal = document.getElementById('manualDate').value;
+  const preview = document.getElementById('manualPreview');
+  if (!uid || !dateVal) { preview.style.display = 'none'; return; }
+  const [y,m,d] = dateVal.split('-').map(Number);
+  const prize = getPrize(uid, y, m, d);
+  document.getElementById('manualPreviewPrize').textContent = `${prize.emoji} ${prize.name}`;
+  preview.style.display = 'block';
+}
+function doManualAdd() {
+  const uid = document.getElementById('manualUID').value.trim();
+  const dateVal = document.getElementById('manualDate').value;
+  const msgEl = document.getElementById('manualAddMsg');
+  function showMsg(text, ok) {
+    msgEl.textContent = text;
+    msgEl.style.background = ok ? '#0d2a1a' : '#2a0d0d';
+    msgEl.style.color = ok ? '#52c41a' : '#ff7875';
+    msgEl.style.border = `1px solid ${ok ? '#52c41a44' : '#ff4d4f44'}`;
+    msgEl.style.display = 'block';
+  }
+  if (!uid) { showMsg('请填写用户 UID', false); return; }
+  if (!dateVal) { showMsg('请选择开奖日期', false); return; }
+  const [y,m,d] = dateVal.split('-').map(Number);
+  const dateKey = `${y}_${m}_${d}`;
+  const unlocked = loadUnlocked(uid);
+  if (unlocked[dateKey]) {
+    showMsg(`UID ${uid} 在 ${y}年${m}月${d}日 已有记录，无需重复登记`, false);
+    return;
+  }
+  unlocked[dateKey] = { ts: Date.now(), uid: uid, manual: true };
+  saveUnlocked(uid, unlocked);
+  const prize = getPrize(uid, y, m, d);
+  showMsg(`✅ 已登记！${y}年${m}月${d}日 · ${prize.emoji} ${prize.name}`, true);
+  renderAllUsersRecords();
+  // 1.5秒后自动关闭
+  setTimeout(() => { closeManualAdd(); }, 1500);
+}
+function closeManualAdd() {
+  document.getElementById('manualAddModal').style.display = 'none';
+}
+
+// ===== 管理员工具 =====
+function generateCode() {
+  const user = document.getElementById('adminUser').value.trim();
+  const dateVal = document.getElementById('adminDate').value;
+  if (!user || !dateVal) { alert('请填写用户UID和查询日期'); return; }
+  const [year, month, day] = dateVal.split('-').map(Number);
+  const code = getUnlockCode(user, year, month, day);
+  const prize = getPrize(user, year, month, day);
+  const dateStr = `${year}年${month}月${day}日`;
+  document.getElementById('resUser').textContent = user;
+  document.getElementById('resDate').textContent = dateStr;
+  document.getElementById('resCode').textContent = code;
+  document.getElementById('resPrize').textContent = `该日期奖励：${prize.emoji} ${prize.name}`;
+  document.getElementById('adminResult').style.display = 'block';
+}
+</script>
+</body>
+</html>
