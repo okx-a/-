@@ -6,512 +6,113 @@
 <title>OKX 交易日历抽奖</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0d0d1a; color: #e0e0e0; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; min-height: 100vh; }
 
-  body {
-    background: #0d0d1a;
-    color: #e0e0e0;
-    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
-    min-height: 100vh;
-  }
-
-  /* ===== 顶部 ===== */
-  .header {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    padding: 20px;
-    text-align: center;
-    border-bottom: 1px solid #333;
-  }
-  .header h1 {
-    font-size: 22px;
-    color: #ffd700;
-    letter-spacing: 1px;
-  }
+  .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 20px; text-align: center; border-bottom: 1px solid #333; }
+  .header h1 { font-size: 22px; color: #ffd700; letter-spacing: 1px; }
   .header p { font-size: 13px; color: #888; margin-top: 4px; }
 
-  /* ===== 昵称/设备区 ===== */
-  .name-section {
-    padding: 20px;
-    text-align: center;
-  }
-  .name-box {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    background: #1a1a2e;
-    border: 1px solid #444;
-    border-radius: 12px;
-    padding: 12px 16px;
-  }
-  .name-box label { font-size: 14px; color: #aaa; white-space: nowrap; }
-  .name-box input {
-    background: #111;
-    border: 1px solid #555;
-    border-radius: 8px;
-    color: #fff;
-    font-size: 15px;
-    padding: 8px 12px;
-    width: 160px;
-    outline: none;
-  }
-  .name-box input:focus { border-color: #ffd700; }
-  .name-box button {
-    background: linear-gradient(135deg, #ffd700, #ffaa00);
-    border: none;
-    border-radius: 8px;
-    color: #000;
-    font-size: 14px;
-    font-weight: bold;
-    padding: 8px 18px;
-    cursor: pointer;
-  }
-  .name-box button:hover { opacity: 0.9; }
-
-  .user-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: #1a2a1a;
-    border: 1px solid #2a4a2a;
-    border-radius: 20px;
-    padding: 6px 16px;
-    font-size: 13px;
-    color: #52c41a;
-    margin-top: 10px;
-  }
-
-  /* ===== 统计条 ===== */
-  .stats-bar {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    padding: 10px 20px;
-    flex-wrap: wrap;
-  }
-  .stat-item {
-    background: #1a1a2e;
-    border: 1px solid #333;
-    border-radius: 10px;
-    padding: 10px 20px;
-    text-align: center;
-    min-width: 100px;
-  }
+  .stats-bar { display: flex; justify-content: center; gap: 20px; padding: 10px 20px; flex-wrap: wrap; }
+  .stat-item { background: #1a1a2e; border: 1px solid #333; border-radius: 10px; padding: 10px 20px; text-align: center; min-width: 100px; }
   .stat-num { font-size: 22px; font-weight: bold; color: #ffd700; }
   .stat-label { font-size: 11px; color: #888; margin-top: 2px; }
 
-  /* ===== 日历 ===== */
-  .calendar-wrap {
-    padding: 0 16px 20px;
-    max-width: 520px;
-    margin: 0 auto;
-  }
-  .cal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 4px;
-  }
+  .calendar-wrap { padding: 0 16px 20px; max-width: 520px; margin: 0 auto; }
+  .cal-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 4px; }
   .cal-title { font-size: 17px; font-weight: bold; color: #fff; }
-  .cal-nav button {
-    background: #333;
-    border: none;
-    border-radius: 6px;
-    color: #aaa;
-    cursor: pointer;
-    font-size: 16px;
-    padding: 4px 12px;
-  }
+  .cal-nav button { background: #333; border: none; border-radius: 6px; color: #aaa; cursor: pointer; font-size: 16px; padding: 4px 12px; }
   .cal-nav button:hover { background: #444; color: #fff; }
+  .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 6px; }
+  .weekday { text-align: center; font-size: 12px; color: #666; padding: 4px 0; }
+  .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
 
-  .weekdays {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
-    margin-bottom: 6px;
-  }
-  .weekday {
-    text-align: center;
-    font-size: 12px;
-    color: #666;
-    padding: 4px 0;
-  }
-
-  .days-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 6px;
-  }
-
-  .day-cell {
-    aspect-ratio: 1;
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    cursor: default;
-    font-size: 13px;
-  }
+  .day-cell { aspect-ratio: 1; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; cursor: default; font-size: 13px; }
   .day-cell.empty { background: transparent; }
-
-  .day-cell.locked {
-    background: #1a1a2e;
-    border: 1px solid #2a2a3e;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
+  .day-cell.locked { background: #1a1a2e; border: 1px solid #2a2a3e; cursor: pointer; transition: all 0.2s; }
   .day-cell.locked:hover { border-color: #ffd700; transform: scale(1.05); }
   .day-cell.locked .day-num { font-size: 12px; color: #555; }
   .day-cell.locked .gift-icon { font-size: 22px; }
-
   .day-cell.today { border-color: #1890ff !important; }
   .day-cell.today .day-num { color: #1890ff !important; }
-
-  .day-cell.unlocked {
-    background: #1a2a1a;
-    border: 2px solid #52c41a;
-    cursor: default;
-    animation: unlockPop 0.4s ease;
-  }
+  .day-cell.unlocked { background: #1a2a1a; border: 2px solid #52c41a; cursor: default; animation: unlockPop 0.4s ease; }
   .day-cell.unlocked .day-num { font-size: 10px; color: #52c41a; }
-  .day-cell.unlocked .prize-mini {
-    font-size: 9px;
-    color: #52c41a;
-    text-align: center;
-    line-height: 1.2;
-    padding: 0 2px;
-  }
-
-  .day-cell.past {
-    background: #111;
-    border: 1px solid #1e1e1e;
-    cursor: not-allowed;
-    opacity: 0.3;
-  }
+  .day-cell.unlocked .prize-mini { font-size: 9px; color: #52c41a; text-align: center; line-height: 1.2; padding: 0 2px; }
+  .day-cell.past { background: #111; border: 1px solid #1e1e1e; cursor: not-allowed; opacity: 0.3; }
   .day-cell.past .day-num { color: #333; }
-
-  .day-cell.past-active {
-    background: #111a11;
-    border: 1px solid #2a3a2a;
-    cursor: pointer;
-    opacity: 0.65;
-    transition: all 0.2s;
-  }
+  .day-cell.past-active { background: #111a11; border: 1px solid #2a3a2a; cursor: pointer; opacity: 0.65; transition: all 0.2s; }
   .day-cell.past-active:hover { opacity: 0.9; border-color: #52c41a; transform: scale(1.03); }
   .day-cell.past-active .day-num { color: #4a6a4a; font-size: 11px; }
   .day-cell.past-active .gift-icon { font-size: 18px; }
+  @keyframes unlockPop { 0%{transform:scale(0.5);opacity:0} 70%{transform:scale(1.15)} 100%{transform:scale(1);opacity:1} }
 
-  @keyframes unlockPop {
-    0% { transform: scale(0.5); opacity: 0; }
-    70% { transform: scale(1.15); }
-    100% { transform: scale(1); opacity: 1; }
-  }
-
-  /* ===== 解锁模态框 ===== */
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.7);
-    z-index: 1000;
-    align-items: center;
-    justify-content: center;
-  }
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; }
   .modal-overlay.show { display: flex; }
-  .modal {
-    background: #1a1a2e;
-    border: 1px solid #444;
-    border-radius: 16px;
-    padding: 28px 24px;
-    width: 300px;
-    text-align: center;
-    position: relative;
-  }
+  .modal { background: #1a1a2e; border: 1px solid #444; border-radius: 16px; padding: 28px 24px; width: 300px; text-align: center; position: relative; }
   .modal h3 { color: #ffd700; font-size: 18px; margin-bottom: 6px; }
   .modal p { color: #888; font-size: 13px; margin-bottom: 16px; line-height: 1.6; }
-  .code-input-wrap {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-    margin-bottom: 16px;
-  }
-  .code-input-wrap input {
-    width: 130px;
-    background: #111;
-    border: 2px solid #555;
-    border-radius: 10px;
-    color: #fff;
-    font-size: 22px;
-    text-align: center;
-    padding: 10px;
-    letter-spacing: 6px;
-    outline: none;
-  }
+  .code-input-wrap { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; }
+  .code-input-wrap input { width: 130px; background: #111; border: 2px solid #555; border-radius: 10px; color: #fff; font-size: 22px; text-align: center; padding: 10px; letter-spacing: 6px; outline: none; }
   .code-input-wrap input:focus { border-color: #ffd700; }
-  .modal .btn-unlock {
-    background: linear-gradient(135deg, #52c41a, #389e0d);
-    border: none;
-    border-radius: 10px;
-    color: #fff;
-    font-size: 15px;
-    font-weight: bold;
-    padding: 12px 30px;
-    cursor: pointer;
-    width: 100%;
-    margin-bottom: 10px;
-  }
-  .modal .btn-cancel {
-    background: #333;
-    border: none;
-    border-radius: 10px;
-    color: #888;
-    font-size: 13px;
-    padding: 8px 20px;
-    cursor: pointer;
-    width: 100%;
-  }
+  .modal .btn-unlock { background: linear-gradient(135deg, #52c41a, #389e0d); border: none; border-radius: 10px; color: #fff; font-size: 15px; font-weight: bold; padding: 12px 30px; cursor: pointer; width: 100%; margin-bottom: 10px; }
+  .modal .btn-cancel { background: #333; border: none; border-radius: 10px; color: #888; font-size: 13px; padding: 8px 20px; cursor: pointer; width: 100%; }
   .code-error { color: #ff4d4f; font-size: 12px; margin-top: -10px; margin-bottom: 10px; }
 
-  /* ===== 奖励揭示动画 ===== */
-  .prize-reveal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.85);
-    z-index: 2000;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-  }
+  .prize-reveal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center; flex-direction: column; }
   .prize-reveal-overlay.show { display: flex; }
-  .prize-box {
-    background: linear-gradient(135deg, #1a2a1a, #0d1a0d);
-    border: 2px solid #52c41a;
-    border-radius: 20px;
-    padding: 40px 50px;
-    text-align: center;
-    animation: prizeReveal 0.5s ease;
-  }
-  @keyframes prizeReveal {
-    0% { transform: scale(0.3) rotate(-10deg); opacity: 0; }
-    60% { transform: scale(1.1) rotate(3deg); }
-    100% { transform: scale(1) rotate(0deg); opacity: 1; }
-  }
+  .prize-box { background: linear-gradient(135deg, #1a2a1a, #0d1a0d); border: 2px solid #52c41a; border-radius: 20px; padding: 40px 50px; text-align: center; animation: prizeReveal 0.5s ease; }
+  @keyframes prizeReveal { 0%{transform:scale(0.3) rotate(-10deg);opacity:0} 60%{transform:scale(1.1) rotate(3deg)} 100%{transform:scale(1) rotate(0deg);opacity:1} }
   .prize-emoji { font-size: 64px; margin-bottom: 12px; display: block; }
   .prize-date-label { font-size: 13px; color: #888; margin-bottom: 6px; }
   .prize-name { font-size: 28px; font-weight: bold; color: #52c41a; margin-bottom: 6px; }
   .prize-subtitle { font-size: 14px; color: #aaa; margin-bottom: 20px; }
-  .prize-confirm {
-    background: linear-gradient(135deg, #52c41a, #389e0d);
-    border: none;
-    border-radius: 12px;
-    color: #fff;
-    font-size: 16px;
-    font-weight: bold;
-    padding: 14px 40px;
-    cursor: pointer;
-  }
-  .confetti-wrap {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    overflow: hidden;
-    z-index: 1999;
-  }
-  .confetti-piece {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    top: -20px;
-    animation: confettiFall linear forwards;
-    border-radius: 2px;
-  }
-  @keyframes confettiFall {
-    to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
-  }
+  .prize-confirm { background: linear-gradient(135deg, #52c41a, #389e0d); border: none; border-radius: 12px; color: #fff; font-size: 16px; font-weight: bold; padding: 14px 40px; cursor: pointer; }
+  .confetti-wrap { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 1999; }
+  .confetti-piece { position: absolute; width: 10px; height: 10px; top: -20px; animation: confettiFall linear forwards; border-radius: 2px; }
+  @keyframes confettiFall { to{transform:translateY(110vh) rotate(720deg);opacity:0} }
 
-  /* ===== 已开奖列表 ===== */
-  .unlocked-list {
-    max-width: 520px;
-    margin: 0 auto;
-    padding: 0 16px 30px;
-  }
+  .unlocked-list { max-width: 520px; margin: 0 auto; padding: 0 16px 30px; }
   .unlocked-title { font-size: 15px; color: #e0e0e0; font-weight: bold; margin-bottom: 12px; }
-  .unlocked-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 14px;
-    background: #1a1a2e;
-    border-radius: 8px;
-    margin-bottom: 6px;
-    font-size: 13px;
-    border-left: 3px solid #52c41a;
-  }
-  .unlocked-item .date-tag { color: #bbb; }
-  .unlocked-item .prize-tag { color: #52c41a; font-weight: bold; }
+  .unlocked-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #1a1a2e; border-radius: 8px; margin-bottom: 6px; font-size: 13px; border-left: 3px solid #52c41a; }
 
-  /* ===== 管理员用户记录区块 ===== */
-  .admin-all-records {
-    max-width: 900px;
-    margin: 0 auto 20px;
-    padding: 16px 20px;
-    background: #080f1a;
-    border: 1px solid #ffd70033;
-    border-radius: 14px;
-  }
-
-  /* ===== 管理员面板 ===== */
-  .admin-panel {
-    display: none;
-    max-width: 520px;
-    margin: 0 auto;
-    padding: 16px;
-    background: #0a0a1a;
-    border: 1px solid #ff4d4f44;
-    border-radius: 12px;
-    margin-bottom: 20px;
-  }
+  .admin-all-records { max-width: 960px; margin: 0 auto 20px; padding: 16px 20px; background: #080f1a; border: 1px solid #ffd70033; border-radius: 14px; }
+  .admin-panel { display: none; max-width: 520px; margin: 0 auto; padding: 16px; background: #0a0a1a; border: 1px solid #ff4d4f44; border-radius: 12px; margin-bottom: 20px; }
   .admin-panel h3 { color: #ff4d4f; font-size: 15px; margin-bottom: 12px; }
-  .admin-row {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 10px;
-    flex-wrap: wrap;
-  }
-  .admin-row input, .admin-row select {
-    background: #111;
-    border: 1px solid #444;
-    border-radius: 8px;
-    color: #fff;
-    font-size: 14px;
-    padding: 8px 12px;
-    flex: 1;
-    min-width: 100px;
-    outline: none;
-  }
-  .admin-row button {
-    background: #ff4d4f;
-    border: none;
-    border-radius: 8px;
-    color: #fff;
-    font-size: 14px;
-    padding: 8px 16px;
-    cursor: pointer;
-  }
-  .admin-result {
-    background: #1a0a0a;
-    border: 1px solid #ff4d4f33;
-    border-radius: 8px;
-    padding: 12px;
-    font-size: 14px;
-    color: #fff;
-  }
+  .admin-row { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+  .admin-row input { background: #111; border: 1px solid #444; border-radius: 8px; color: #fff; font-size: 14px; padding: 8px 12px; flex: 1; min-width: 100px; outline: none; }
+  .admin-row button { background: #ff4d4f; border: none; border-radius: 8px; color: #fff; font-size: 14px; padding: 8px 16px; cursor: pointer; }
+  .admin-result { background: #1a0a0a; border: 1px solid #ff4d4f33; border-radius: 8px; padding: 12px; font-size: 14px; color: #fff; }
   .admin-code { font-size: 28px; color: #ff4d4f; font-weight: bold; letter-spacing: 6px; }
-  .admin-prize { font-size: 14px; color: #aaa; margin-top: 4px; }
 
-  /* ===== 提示 ===== */
-  .hint-banner {
-    max-width: 520px;
-    margin: 0 auto 16px;
-    padding: 0 16px;
-  }
-  .hint-box {
-    background: #0a1628;
-    border: 1px solid #1890ff33;
-    border-radius: 10px;
-    padding: 12px 16px;
-    font-size: 12px;
-    color: #888;
-    line-height: 1.8;
-  }
+  .hint-banner { max-width: 520px; margin: 0 auto 16px; padding: 0 16px; }
+  .hint-box { background: #0a1628; border: 1px solid #1890ff33; border-radius: 10px; padding: 12px 16px; font-size: 12px; color: #888; line-height: 1.8; }
   .hint-box strong { color: #1890ff; }
 
-  /* ===== 预算总览条（管理员）===== */
-  .budget-bar {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin-bottom: 14px;
-  }
-  .budget-card {
-    background: #0d1828;
-    border: 1px solid #1e3a5a;
-    border-radius: 10px;
-    padding: 10px 12px;
-    text-align: center;
-  }
+  .budget-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+  .budget-card { background: #0d1828; border: 1px solid #1e3a5a; border-radius: 10px; padding: 10px 12px; text-align: center; }
   .budget-card .b-val { font-size: 20px; font-weight: bold; color: #ffd700; }
   .budget-card .b-label { font-size: 11px; color: #666; margin-top: 2px; }
-  .budget-progress-wrap {
-    background: #0d1828;
-    border: 1px solid #1e3a5a;
-    border-radius: 10px;
-    padding: 10px 14px;
-    margin-bottom: 10px;
-  }
-  .budget-progress-bar {
-    height: 8px;
-    background: #1a2a1a;
-    border-radius: 4px;
-    overflow: hidden;
-    margin-top: 6px;
-  }
-  .budget-progress-fill {
-    height: 100%;
-    border-radius: 4px;
-    transition: width 0.4s;
-  }
-  .budget-over-alert {
-    display: none;
-    align-items: center;
-    gap: 10px;
-    background: #2a0808;
-    border: 1px solid #ff4d4f66;
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-size: 13px;
-    color: #ff7875;
-    margin-bottom: 10px;
-  }
+  .budget-progress-wrap { background: #0d1828; border: 1px solid #1e3a5a; border-radius: 10px; padding: 10px 14px; margin-bottom: 10px; }
+  .budget-progress-bar { height: 8px; background: #1a2a1a; border-radius: 4px; overflow: hidden; margin-top: 6px; }
+  .budget-progress-fill { height: 100%; border-radius: 4px; transition: width 0.4s; }
+  .budget-over-alert { display: none; align-items: center; gap: 10px; background: #2a0808; border: 1px solid #ff4d4f66; border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #ff7875; margin-bottom: 10px; }
 </style>
 </head>
 <body>
 
-<!-- 顶部标题 -->
 <div class="header">
   <h1>🎯 OKX 交易日历奖励<span id="adminBadge" style="display:none;margin-left:8px;background:#ff4d4f;color:#fff;font-size:11px;padding:2px 8px;border-radius:10px;vertical-align:middle;">🔐 管理专属</span></h1>
   <p>每天交易·每天开奖·每人专属</p>
 </div>
 
-<!-- 昵称输入区（仅用于标识，默认隐藏，用户页自动分配设备ID） -->
-<div class="name-section" id="nameSection" style="display:none;"></div>
-
-<!-- 管理员面板（URL加 ?admin=1 开启） -->
-<div class="admin-panel" id="adminPanel">
-  <h3>🔐 管理员工具 · 生成解锁码</h3>
-  <div class="admin-row">
-    <input type="date" id="adminDate" style="color-scheme:dark;flex:2;">
-    <button onclick="generateCode()">🎲 生成今日解锁码</button>
-  </div>
-  <div class="admin-result" id="adminResult" style="display:none;">
-    <div>日期：<strong id="resDate" style="color:#ffd700;"></strong></div>
-    <div class="admin-code" id="resCode"></div>
-    <div class="admin-prize" id="resPrize"></div>
-    <div style="font-size:11px;color:#666;margin-top:6px;">💡 同一天可多次生成不同码，末两位=日期，均有效</div>
-  </div>
+<!-- 管理员面板（保留不可见的date input供JS使用） -->
+<div id="adminPanel" style="display:none;">
+  <input type="date" id="adminDate" style="display:none;">
 </div>
 
 <!-- 统计条 -->
 <div class="stats-bar" id="statsBar" style="display:none;">
-  <div class="stat-item">
-    <div class="stat-num" id="statDays">0</div>
-    <div class="stat-label">已开奖天数</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-num" id="statValue">0U</div>
-    <div class="stat-label">累计奖励</div>
-  </div>
+  <div class="stat-item"><div class="stat-num" id="statDays">0</div><div class="stat-label">已开奖天数</div></div>
+  <div class="stat-item"><div class="stat-num" id="statValue">0U</div><div class="stat-label">累计奖励</div></div>
 </div>
 
 <!-- 使用说明 -->
@@ -526,19 +127,13 @@
 <!-- 日历 -->
 <div class="calendar-wrap" id="calendarWrap" style="display:none;">
   <div class="cal-header">
-    <div class="cal-nav">
-      <button onclick="prevMonth()">‹</button>
-    </div>
+    <div class="cal-nav"><button onclick="prevMonth()">‹</button></div>
     <div class="cal-title" id="calTitle"></div>
-    <div class="cal-nav">
-      <button onclick="nextMonth()">›</button>
-    </div>
+    <div class="cal-nav"><button onclick="nextMonth()">›</button></div>
   </div>
   <div class="weekdays">
-    <div class="weekday">日</div><div class="weekday">一</div>
-    <div class="weekday">二</div><div class="weekday">三</div>
-    <div class="weekday">四</div><div class="weekday">五</div>
-    <div class="weekday">六</div>
+    <div class="weekday">日</div><div class="weekday">一</div><div class="weekday">二</div>
+    <div class="weekday">三</div><div class="weekday">四</div><div class="weekday">五</div><div class="weekday">六</div>
   </div>
   <div class="days-grid" id="daysGrid"></div>
 </div>
@@ -549,50 +144,42 @@
   <div id="unlockedItems"></div>
 </div>
 
-<!-- 管理员用户开奖记录（仅管理员可见） -->
+<!-- 管理员用户开奖记录 -->
 <div class="admin-all-records" id="adminAllRecords" style="display:none;">
-  <!-- 标题 -->
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
     <span style="color:#ffd700;font-size:15px;font-weight:bold;">📊 奖池总览 &amp; 用户记录</span>
     <button onclick="renderAllUsersRecords()" style="background:#1a3a5a;border:1px solid #1890ff;border-radius:6px;color:#1890ff;font-size:12px;padding:5px 12px;cursor:pointer;">↻ 刷新</button>
   </div>
 
-  <!-- 预算总览条 -->
+  <!-- 预算总览 -->
   <div id="adminBudgetBar">
     <div class="budget-bar">
-      <div class="budget-card">
-        <div class="b-val">150U</div>
-        <div class="b-label">总奖池</div>
-      </div>
-      <div class="budget-card">
-        <div class="b-val" id="adminTotalSent" style="color:#52c41a;">0U</div>
-        <div class="b-label">已发放</div>
-      </div>
-      <div class="budget-card">
-        <div class="b-val" id="adminRemaining" style="color:#1890ff;">150U</div>
-        <div class="b-label">剩余可发</div>
-      </div>
-      <div class="budget-card">
-        <div class="b-val" id="adminTotalUsers" style="color:#b37feb;">0</div>
-        <div class="b-label">已登记用户</div>
-      </div>
+      <div class="budget-card"><div class="b-val">150U</div><div class="b-label">总奖池</div></div>
+      <div class="budget-card"><div class="b-val" id="adminTotalSent" style="color:#52c41a;">0U</div><div class="b-label">已发放</div></div>
+      <div class="budget-card"><div class="b-val" id="adminRemaining" style="color:#1890ff;">150U</div><div class="b-label">剩余可发</div></div>
+      <div class="budget-card"><div class="b-val" id="adminTotalUsers" style="color:#b37feb;">0</div><div class="b-label">已登记用户</div></div>
     </div>
     <div class="budget-progress-wrap">
       <div style="display:flex;justify-content:space-between;font-size:12px;color:#888;">
-        <span>预算使用进度</span>
-        <span id="adminBudgetPct">0%</span>
+        <span>预算使用进度</span><span id="adminBudgetPct">0%</span>
       </div>
       <div class="budget-progress-bar">
         <div class="budget-progress-fill" id="adminBudgetFill" style="width:0%;background:linear-gradient(90deg,#52c41a,#1890ff);"></div>
       </div>
     </div>
-    <!-- 超出预算提示 -->
     <div class="budget-over-alert" id="adminOverBudget">
       🚨 <div><strong>超出预算！</strong> 已超出 <strong id="adminOverAmount">0U</strong>，当前新开奖已自动切换为保底奖品（0.1U + 红包）</div>
     </div>
+    <!-- 月份复原按钮 -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+      <button onclick="resetMonthlyBudget()" style="background:linear-gradient(135deg,#1a2a4a,#0d1a2e);border:1px solid #1890ff88;border-radius:8px;color:#1890ff;font-size:13px;padding:8px 20px;cursor:pointer;font-weight:bold;">
+        🔄 月份复原（清空本月记录，重新以150U开始）
+      </button>
+      <span style="font-size:11px;color:#555;">复原前建议先导出备份</span>
+    </div>
   </div>
 
-  <!-- UID搜索栏 -->
+  <!-- 搜索 -->
   <div style="display:flex;gap:8px;margin-bottom:10px;">
     <input id="uidSearch" type="text" placeholder="🔍 搜索UID…" oninput="renderAllUsersRecords()"
       style="flex:1;background:#111;border:1px solid #2a4a6a;border-radius:8px;color:#fff;font-size:13px;padding:8px 12px;outline:none;">
@@ -600,50 +187,51 @@
       style="background:#1a1a2e;border:1px solid #444;border-radius:8px;color:#888;font-size:12px;padding:8px 10px;cursor:pointer;">✕ 清空</button>
   </div>
 
-  <!-- 操作按钮行 -->
+  <!-- 操作按钮 -->
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
-    <button onclick="exportRecords()"
-      style="background:#0d2a1a;border:1px solid #52c41a66;border-radius:8px;color:#52c41a;font-size:12px;padding:7px 14px;cursor:pointer;">📤 导出备份</button>
+    <button onclick="exportRecords()" style="background:#0d2a1a;border:1px solid #52c41a66;border-radius:8px;color:#52c41a;font-size:12px;padding:7px 14px;cursor:pointer;">📤 导出备份</button>
     <label style="background:#0d1a2e;border:1px solid #1890ff66;border-radius:8px;color:#1890ff;font-size:12px;padding:7px 14px;cursor:pointer;">
-      📥 导入复原
-      <input type="file" accept=".json" onchange="importRecords(this)" style="display:none;">
+      📥 导入复原<input type="file" accept=".json" onchange="importRecords(this)" style="display:none;">
     </label>
-    <button onclick="clearSingleUID()"
-      style="background:#1a1a0a;border:1px solid #faad1466;border-radius:8px;color:#faad14;font-size:12px;padding:7px 14px;cursor:pointer;">🧹 清除指定UID</button>
-    <button onclick="clearAllRecords()"
-      style="background:#1a0a0a;border:1px solid #ff4d4f66;border-radius:8px;color:#ff4d4f;font-size:12px;padding:7px 14px;cursor:pointer;">🗑️ 清除全部记录</button>
-    <button onclick="showManualAdd()"
-      style="background:#1a0a2e;border:1px solid #b37feb88;border-radius:8px;color:#b37feb;font-size:12px;padding:7px 14px;cursor:pointer;">📝 手动登记奖励</button>
+    <button onclick="clearSingleUID()" style="background:#1a1a0a;border:1px solid #faad1466;border-radius:8px;color:#faad14;font-size:12px;padding:7px 14px;cursor:pointer;">🧹 清除指定UID</button>
+    <button onclick="clearAllRecords()" style="background:#1a0a0a;border:1px solid #ff4d4f66;border-radius:8px;color:#ff4d4f;font-size:12px;padding:7px 14px;cursor:pointer;">🗑️ 清除全部记录</button>
+    <button onclick="showManualAdd()" style="background:#1a0a2e;border:1px solid #b37feb88;border-radius:8px;color:#b37feb;font-size:12px;padding:7px 14px;cursor:pointer;">📝 手动登记奖励</button>
   </div>
   <div id="allUsersRecords"></div>
 </div>
 
 <!-- 手动登记奖励模态框 -->
 <div id="manualAddModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;align-items:center;justify-content:center;">
-  <div style="background:#131929;border:1px solid #b37feb88;border-radius:16px;padding:24px;width:90%;max-width:380px;box-shadow:0 8px 32px rgba(0,0,0,0.6);">
+  <div style="background:#131929;border:1px solid #b37feb88;border-radius:16px;padding:24px;width:90%;max-width:400px;box-shadow:0 8px 32px rgba(0,0,0,0.6);">
     <h3 style="color:#b37feb;font-size:16px;margin-bottom:6px;">📝 手动登记用户奖励</h3>
-    <p style="color:#888;font-size:12px;margin-bottom:16px;">用户截图发群后，在此登记到管理端记录</p>
+    <p style="color:#888;font-size:12px;margin-bottom:16px;">填写你发给用户的实际解锁码，确保奖励与用户看到的一致</p>
     <div style="margin-bottom:12px;">
       <label style="color:#aaa;font-size:12px;display:block;margin-bottom:4px;">用户 UID（纯数字）</label>
       <input id="manualUID" type="text" placeholder="例：76175051568852992"
         style="width:100%;background:#0d0d1a;border:1px solid #444;border-radius:8px;color:#fff;font-size:14px;padding:9px 12px;outline:none;">
     </div>
-    <div style="margin-bottom:16px;">
+    <div style="margin-bottom:12px;">
       <label style="color:#aaa;font-size:12px;display:block;margin-bottom:4px;">开奖日期</label>
-      <input id="manualDate" type="date"
-        style="width:100%;background:#0d0d1a;border:1px solid #444;border-radius:8px;color:#fff;font-size:14px;padding:9px 12px;outline:none;color-scheme:dark;">
+      <input id="manualDate" type="date" style="width:100%;background:#0d0d1a;border:1px solid #444;border-radius:8px;color:#fff;font-size:14px;padding:9px 12px;outline:none;color-scheme:dark;">
+    </div>
+    <div style="margin-bottom:16px;">
+      <label style="color:#aaa;font-size:12px;display:block;margin-bottom:4px;">
+        发给用户的解锁码
+        <span style="color:#555;">（4位数字，末两位=日期）</span>
+        <button onclick="autoFillManualCode()" style="float:right;background:#1a1050;border:1px solid #b37feb66;border-radius:4px;color:#b37feb;font-size:11px;padding:2px 8px;cursor:pointer;">🎲 自动生成</button>
+      </label>
+      <input id="manualCode" type="text" maxlength="4" placeholder="例：5530"
+        oninput="this.value=this.value.replace(/[^0-9]/g,'');updateManualPreview();"
+        style="width:100%;background:#0d0d1a;border:1px solid #444;border-radius:8px;color:#ffd700;font-size:20px;padding:9px 12px;outline:none;letter-spacing:6px;text-align:center;">
     </div>
     <div id="manualPreview" style="display:none;background:#0d1828;border:1px solid #1e3a5a;border-radius:8px;padding:10px;margin-bottom:14px;font-size:13px;">
-      <div style="color:#aaa;font-size:11px;margin-bottom:4px;">自动生成解锁码：<strong id="manualCodePreview" style="color:#ffd700;letter-spacing:3px;"></strong></div>
       <span style="color:#aaa;">预测奖励：</span>
       <span id="manualPreviewPrize" style="color:#52c41a;font-weight:bold;"></span>
     </div>
     <div id="manualAddMsg" style="display:none;font-size:12px;padding:6px 10px;border-radius:6px;margin-bottom:10px;"></div>
     <div style="display:flex;gap:10px;">
-      <button onclick="doManualAdd()"
-        style="flex:1;background:#2a1050;border:1px solid #b37feb;border-radius:8px;color:#b37feb;font-size:13px;padding:9px;cursor:pointer;font-weight:bold;">✅ 确认登记</button>
-      <button onclick="closeManualAdd()"
-        style="flex:1;background:#1a1a2e;border:1px solid #444;border-radius:8px;color:#888;font-size:13px;padding:9px;cursor:pointer;">取消</button>
+      <button onclick="doManualAdd()" style="flex:1;background:#2a1050;border:1px solid #b37feb;border-radius:8px;color:#b37feb;font-size:13px;padding:9px;cursor:pointer;font-weight:bold;">✅ 确认登记</button>
+      <button onclick="closeManualAdd()" style="flex:1;background:#1a1a2e;border:1px solid #444;border-radius:8px;color:#888;font-size:13px;padding:9px;cursor:pointer;">取消</button>
     </div>
   </div>
 </div>
@@ -686,32 +274,28 @@ const ACTIVITY_START = '2026-03-17';
 const BUDGET = 150;
 
 // ===== 奖池（总权重1000，EV≈0.489U/次）=====
-// 200人≈97.9U | 250人≈122.1U | 300人≈146.85U（均在150U以内）
+// 200人≈97.9U | 250人≈122.4U | 300人≈146.85U（均≤150U）
 const PRIZES = [
-  // 高概率档（权重合计900，约90%）
-  { name: 'USDT 0.1U',                           emoji:'💰', value:0.1, weight:110, type:'usdt'    },
-  { name: 'USDT 0.2U',                           emoji:'💰', value:0.2, weight:130, type:'usdt'    },
-  { name: 'USDT 0.3U',                           emoji:'💰', value:0.3, weight:130, type:'usdt'    },
-  { name: 'USDT 0.4U',                           emoji:'💰', value:0.4, weight:160, type:'usdt'    },
-  { name: 'USDT 0.5U',                           emoji:'💰', value:0.5, weight:155, type:'usdt'    },
-  { name: 'USDT 0.6U',                           emoji:'💰', value:0.6, weight:155, type:'usdt'    },
-  { name:'🧧 私信群主领红包（10U红包20人抢）',   emoji:'🧧', value:0.5, weight: 60, type:'hongbao', special:true },
-  // 中等概率档（权重合计92，约9.2%）
-  { name: 'USDT 1U',                             emoji:'💰', value:1,   weight: 34, type:'usdt'    },
-  { name: '返佣卡 1U',                           emoji:'🃏', value:1,   weight: 27, type:'rebate'  },
-  { name: '体验金 2U',                           emoji:'🎁', value:2,   weight: 31, type:'trial'   },
-  // 极低概率档（权重合计8，约0.8%，30天≈2次）
-  { name: 'USDT 2U',                             emoji:'💰', value:2,   weight:  2, type:'usdt'    },
-  { name: '返佣卡 2U',                           emoji:'🃏', value:2,   weight:  2, type:'rebate'  },
-  { name: '体验金 4U',                           emoji:'🎁', value:4,   weight:  2, type:'trial'   },
-  { name: '体验金 5U',                           emoji:'🎁', value:5,   weight:  2, type:'trial'   },
+  { name:'USDT 0.1U',                          emoji:'💰', value:0.1, weight:110, type:'usdt'    },
+  { name:'USDT 0.2U',                          emoji:'💰', value:0.2, weight:130, type:'usdt'    },
+  { name:'USDT 0.3U',                          emoji:'💰', value:0.3, weight:130, type:'usdt'    },
+  { name:'USDT 0.4U',                          emoji:'💰', value:0.4, weight:160, type:'usdt'    },
+  { name:'USDT 0.5U',                          emoji:'💰', value:0.5, weight:155, type:'usdt'    },
+  { name:'USDT 0.6U',                          emoji:'💰', value:0.6, weight:155, type:'usdt'    },
+  { name:'🧧 私信群主领红包（10U红包20人抢）', emoji:'🧧', value:0.5, weight: 60, type:'hongbao', special:true },
+  { name:'USDT 1U',                            emoji:'💰', value:1,   weight: 34, type:'usdt'    },
+  { name:'返佣卡 1U',                          emoji:'🃏', value:1,   weight: 27, type:'rebate'  },
+  { name:'体验金 2U',                          emoji:'🎁', value:2,   weight: 31, type:'trial'   },
+  { name:'USDT 2U',                            emoji:'💰', value:2,   weight:  2, type:'usdt'    },
+  { name:'返佣卡 2U',                          emoji:'🃏', value:2,   weight:  2, type:'rebate'  },
+  { name:'体验金 4U',                          emoji:'🎁', value:4,   weight:  2, type:'trial'   },
+  { name:'体验金 5U',                          emoji:'🎁', value:5,   weight:  2, type:'trial'   },
 ];
-// 权重总计 = 1000 | EV = 0.489U/次
 
-// ===== 超出预算后的保底奖池 =====
+// 超出预算后的保底奖池
 const FALLBACK_PRIZES = [
-  { name: 'USDT 0.1U',                           emoji:'💰', value:0.1, weight:700, type:'usdt'    },
-  { name:'🧧 私信群主领红包（10U红包20人抢）',   emoji:'🧧', value:0.5, weight:300, type:'hongbao', special:true },
+  { name:'USDT 0.1U',                          emoji:'💰', value:0.1, weight:700, type:'usdt'    },
+  { name:'🧧 私信群主领红包（10U红包20人抢）', emoji:'🧧', value:0.5, weight:300, type:'hongbao', special:true },
 ];
 
 // ===== 工具函数 =====
@@ -724,32 +308,30 @@ function hashStr(str) {
   return h;
 }
 
-// 根据解锁码决定奖品（fallback=true时使用保底奖池）
 function getPrize(code, fallback) {
-  const pool = fallback ? FALLBACK_PRIZES : PRIZES;
-  const hash = hashStr((code || '0000') + '_PRIZE_' + SALT);
-  const total = pool.reduce((s, p) => s + p.weight, 0);
-  const roll = hash % total;
-  let cum = 0;
-  for (const p of pool) {
-    cum += p.weight;
-    if (roll < cum) return p;
+  var pool = fallback ? FALLBACK_PRIZES : PRIZES;
+  var hash = hashStr((code || '0000') + '_PRIZE_' + SALT);
+  var total = pool.reduce(function(s,p){return s+p.weight;}, 0);
+  var roll = hash % total;
+  var cum = 0;
+  for (var i = 0; i < pool.length; i++) {
+    cum += pool[i].weight;
+    if (roll < cum) return pool[i];
   }
   return pool[0];
 }
 
-// 计算已发放奖励总额（仅统计纯数字UID的记录）
 function getTotalBudgetUsed() {
-  const PREFIX = 'okx_cal_';
-  let total = 0;
-  for (let i = 0; i < localStorage.length; i++) {
-    const k = localStorage.key(i);
+  var PREFIX = 'okx_cal_';
+  var total = 0;
+  for (var i = 0; i < localStorage.length; i++) {
+    var k = localStorage.key(i);
     if (!k || !k.startsWith(PREFIX)) continue;
-    const uid = k.slice(PREFIX.length);
+    var uid = k.slice(PREFIX.length);
     if (!/^\d+$/.test(uid)) continue;
     try {
-      const data = JSON.parse(localStorage.getItem(k) || '{}');
-      Object.values(data).forEach(rec => {
+      var data = JSON.parse(localStorage.getItem(k) || '{}');
+      Object.values(data).forEach(function(rec) {
         total += getPrize(rec && rec.code ? rec.code : '0000', rec && rec.fallback ? true : false).value || 0;
       });
     } catch(e) {}
@@ -757,66 +339,54 @@ function getTotalBudgetUsed() {
   return total;
 }
 
-// 自动分配设备ID（存入localStorage，8位字母数字）
 function getDeviceId() {
-  const KEY = 'okx_device_id';
-  let id = localStorage.getItem(KEY);
+  var KEY = 'okx_device_id';
+  var id = localStorage.getItem(KEY);
   if (!id) {
-    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    id = Array.from({length:8}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
+    var chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    id = Array.from({length:8}, function(){ return chars[Math.floor(Math.random()*chars.length)]; }).join('');
     localStorage.setItem(KEY, id);
   }
   return id;
 }
 
-// 生成解锁码：RRDD（前两位随机，后两位=当月日期）
+// 生成解锁码：前两位随机，后两位=日期
 function generateDiceCode(day) {
-  const prefix = Math.floor(Math.random() * 100);
-  return prefix.toString().padStart(2, '0') + day.toString().padStart(2, '0');
+  var prefix = Math.floor(Math.random() * 100);
+  return prefix.toString().padStart(2,'0') + day.toString().padStart(2,'0');
 }
 
-// 验证解锁码：只验证后两位是否等于日期
+// 验证解锁码：只看后两位是否等于日期
 function verifyDiceCode(entered, day) {
   if (!entered || entered.length !== 4 || !/^\d{4}$/.test(entered)) return false;
-  return entered.slice(2) === day.toString().padStart(2, '0');
+  return entered.slice(2) === day.toString().padStart(2,'0');
 }
 
-function getStorageKey(username) {
-  return 'okx_cal_' + username.toLowerCase().trim();
-}
-
+function getStorageKey(username) { return 'okx_cal_' + username.toLowerCase().trim(); }
 function loadUnlocked(username) {
-  try {
-    return JSON.parse(localStorage.getItem(getStorageKey(username)) || '{}');
-  } catch(e) { return {}; }
+  try { return JSON.parse(localStorage.getItem(getStorageKey(username)) || '{}'); } catch(e) { return {}; }
 }
-
-function saveUnlocked(username, data) {
-  localStorage.setItem(getStorageKey(username), JSON.stringify(data));
-}
+function saveUnlocked(username, data) { localStorage.setItem(getStorageKey(username), JSON.stringify(data)); }
 
 // ===== 状态 =====
-let currentUser = '';
-let currentYear = new Date().getFullYear();
-let currentMonth = new Date().getMonth() + 1;
-let pendingDate = null;
-const isAdmin = new URLSearchParams(location.search).has('admin');
+var currentUser = '';
+var currentYear = new Date().getFullYear();
+var currentMonth = new Date().getMonth() + 1;
+var pendingDate = null;
+var isAdmin = new URLSearchParams(location.search).has('admin');
 
 // ===== 初始化 =====
 window.onload = function() {
   currentUser = getDeviceId();
   if (isAdmin) {
     document.getElementById('adminBadge').style.display = 'inline';
-    document.getElementById('adminPanel').style.display = 'block';
     document.getElementById('adminAllRecords').style.display = 'block';
     document.getElementById('statsBar').style.display = 'none';
     document.getElementById('hintBanner').style.display = 'none';
     document.getElementById('calendarWrap').style.display = 'none';
     document.getElementById('unlockedList').style.display = 'none';
-    const now = new Date();
-    const mm = String(now.getMonth()+1).padStart(2,'0');
-    const dd = String(now.getDate()).padStart(2,'0');
-    document.getElementById('adminDate').value = now.getFullYear() + '-' + mm + '-' + dd;
+    var now = new Date();
+    document.getElementById('adminDate').value = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
     renderAllUsersRecords();
   } else {
     document.getElementById('statsBar').style.display = 'flex';
@@ -831,87 +401,62 @@ window.onload = function() {
 
 // ===== 日历渲染 =====
 function renderCalendar() {
-  const months = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+  var months = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
   document.getElementById('calTitle').textContent = currentYear + '年 ' + months[currentMonth-1];
-
-  const grid = document.getElementById('daysGrid');
+  var grid = document.getElementById('daysGrid');
   grid.innerHTML = '';
-
-  const today = new Date();
-  const firstDay = new Date(currentYear, currentMonth - 1, 1).getDay();
-  const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
-  const unlocked = loadUnlocked(currentUser);
-
-  for (let i = 0; i < firstDay; i++) {
-    const empty = document.createElement('div');
-    empty.className = 'day-cell empty';
-    grid.appendChild(empty);
+  var today = new Date();
+  var firstDay = new Date(currentYear, currentMonth-1, 1).getDay();
+  var daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+  var unlocked = loadUnlocked(currentUser);
+  for (var i = 0; i < firstDay; i++) {
+    var e = document.createElement('div'); e.className = 'day-cell empty'; grid.appendChild(e);
   }
-
-  for (let d = 1; d <= daysInMonth; d++) {
-    const cell = document.createElement('div');
-    const dateKey = currentYear + '_' + currentMonth + '_' + d;
-    const isToday = (today.getFullYear() === currentYear && today.getMonth()+1 === currentMonth && today.getDate() === d);
-    const isPast = new Date(currentYear, currentMonth-1, d) < new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    const actStart = new Date(ACTIVITY_START);
-    const thisDate = new Date(currentYear, currentMonth-1, d);
-    const beforeActivity = thisDate < actStart;
-
+  for (var d = 1; d <= daysInMonth; d++) {
+    var cell = document.createElement('div');
+    var dateKey = currentYear + '_' + currentMonth + '_' + d;
+    var isToday = (today.getFullYear()===currentYear && today.getMonth()+1===currentMonth && today.getDate()===d);
+    var isPast = new Date(currentYear,currentMonth-1,d) < new Date(today.getFullYear(),today.getMonth(),today.getDate());
+    var beforeActivity = new Date(currentYear,currentMonth-1,d) < new Date(ACTIVITY_START);
     if (unlocked[dateKey]) {
-      const rec = unlocked[dateKey];
-      const prize = getPrize(rec && rec.code ? rec.code : '0000', rec && rec.fallback ? true : false);
+      var rec = unlocked[dateKey];
+      var prize = getPrize(rec&&rec.code?rec.code:'0000', rec&&rec.fallback?true:false);
       cell.className = 'day-cell unlocked';
-      cell.innerHTML = '<span class="day-num">' + d + '日</span><span class="prize-mini">' + prize.emoji + '<br>' + prize.name.split(' ')[0] + '</span>';
+      cell.innerHTML = '<span class="day-num">'+d+'日</span><span class="prize-mini">'+prize.emoji+'<br>'+prize.name.split(' ')[0]+'</span>';
     } else if (beforeActivity) {
       cell.className = 'day-cell past';
-      cell.innerHTML = '<span class="day-num">' + d + '</span>';
+      cell.innerHTML = '<span class="day-num">'+d+'</span>';
     } else if (isPast && !isToday) {
       cell.className = 'day-cell past-active';
-      cell.innerHTML = '<span class="gift-icon">🎁</span><span class="day-num">' + d + '日</span>';
+      cell.innerHTML = '<span class="gift-icon">🎁</span><span class="day-num">'+d+'日</span>';
       cell.onclick = (function(day){ return function(){ openUnlockModal(day); }; })(d);
     } else {
-      cell.className = 'day-cell locked' + (isToday ? ' today' : '');
-      cell.innerHTML = '<span class="gift-icon">🎁</span><span class="day-num">' + d + '</span>';
+      cell.className = 'day-cell locked' + (isToday?' today':'');
+      cell.innerHTML = '<span class="gift-icon">🎁</span><span class="day-num">'+d+'</span>';
       cell.onclick = (function(day){ return function(){ openUnlockModal(day); }; })(d);
     }
     grid.appendChild(cell);
   }
 }
 
-function goToday() {
-  const now = new Date();
-  currentYear = now.getFullYear();
-  currentMonth = now.getMonth() + 1;
-  renderCalendar();
-}
 function prevMonth() {
-  const actStart = new Date(ACTIVITY_START);
-  const prevY = currentMonth === 1 ? currentYear - 1 : currentYear;
-  const prevM = currentMonth === 1 ? 12 : currentMonth - 1;
-  if (new Date(prevY, prevM - 1, 28) < new Date(actStart.getFullYear(), actStart.getMonth(), 1)) return;
-  currentMonth = prevM; currentYear = prevY;
-  renderCalendar();
+  var prevY = currentMonth===1?currentYear-1:currentYear, prevM = currentMonth===1?12:currentMonth-1;
+  if (new Date(prevY,prevM-1,28) < new Date(new Date(ACTIVITY_START).getFullYear(), new Date(ACTIVITY_START).getMonth(), 1)) return;
+  currentMonth = prevM; currentYear = prevY; renderCalendar();
 }
 function nextMonth() {
-  const now = new Date();
-  const futureLimit = new Date(now.getFullYear(), now.getMonth() + 3, 1);
-  const nextDate = new Date(currentYear, currentMonth, 1);
-  if (nextDate >= futureLimit) return;
-  currentMonth++;
-  if (currentMonth > 12) { currentMonth = 1; currentYear++; }
-  renderCalendar();
+  var now = new Date();
+  if (new Date(currentYear, currentMonth, 1) >= new Date(now.getFullYear(), now.getMonth()+3, 1)) return;
+  currentMonth++; if (currentMonth>12){currentMonth=1;currentYear++;} renderCalendar();
 }
 
 // ===== 解锁逻辑 =====
 function openUnlockModal(day) {
   pendingDate = { year: currentYear, month: currentMonth, day: day };
-  const dateStr = currentYear + '年' + currentMonth + '月' + day + '日';
-  const today = new Date();
-  const isToday = (today.getFullYear()===currentYear && today.getMonth()+1===currentMonth && today.getDate()===day);
-  const desc = isToday
-    ? '<strong style="color:#ffd700">' + dateStr + '</strong><br>发今天的交易截图给管理员<br>收到4位解锁码后在这里输入'
-    : '<strong style="color:#ffd700">' + dateStr + '</strong><br>⏪ 补领历史奖励<br>输入管理员发给你的补发解锁码';
-  document.getElementById('modalDesc').innerHTML = desc;
+  var dateStr = currentYear+'年'+currentMonth+'月'+day+'日';
+  var today = new Date();
+  var isToday = (today.getFullYear()===currentYear && today.getMonth()+1===currentMonth && today.getDate()===day);
+  document.getElementById('modalDesc').innerHTML = '<strong style="color:#ffd700">'+dateStr+'</strong><br>'+(isToday?'发今天的交易截图给管理员<br>收到4位解锁码后在这里输入':'⏪ 补领历史奖励<br>输入管理员发给你的补发解锁码');
   document.getElementById('codeInput').value = '';
   document.getElementById('codeError').style.display = 'none';
   document.getElementById('unlockModal').classList.add('show');
@@ -919,50 +464,29 @@ function openUnlockModal(day) {
   document.querySelector('#unlockModal .btn-unlock').textContent = isToday ? '确认解锁 🔓' : '补领解锁 🔓';
 }
 
-function closeModal() {
-  document.getElementById('unlockModal').classList.remove('show');
-  pendingDate = null;
-}
+function closeModal() { document.getElementById('unlockModal').classList.remove('show'); pendingDate = null; }
 
 function doUnlock() {
   if (!pendingDate) return;
-  const entered = document.getElementById('codeInput').value.trim();
-
+  var entered = document.getElementById('codeInput').value.trim();
   if (!verifyDiceCode(entered, pendingDate.day)) {
     document.getElementById('codeError').style.display = 'block';
     document.getElementById('codeInput').value = '';
     document.getElementById('codeInput').focus();
     return;
   }
-
-  const uYear = pendingDate.year;
-  const uMonth = pendingDate.month;
-  const uDay = pendingDate.day;
-  const dateKey = uYear + '_' + uMonth + '_' + uDay;
-
-  // 检查已有记录
-  const unlocked = loadUnlocked(currentUser);
-  if (unlocked[dateKey]) {
-    closeModal();
-    return;
-  }
-
-  // 检查预算是否超出
-  const currentTotal = getTotalBudgetUsed();
-  const isFallback = currentTotal >= BUDGET;
-
+  var uYear = pendingDate.year, uMonth = pendingDate.month, uDay = pendingDate.day;
+  var dateKey = uYear+'_'+uMonth+'_'+uDay;
+  var unlocked = loadUnlocked(currentUser);
+  if (unlocked[dateKey]) { closeModal(); return; }
+  var currentTotal = getTotalBudgetUsed();
+  var isFallback = currentTotal >= BUDGET;
   unlocked[dateKey] = { ts: Date.now(), uid: currentUser, code: entered, fallback: isFallback };
   saveUnlocked(currentUser, unlocked);
-
   closeModal();
-
-  const prize = getPrize(entered, isFallback);
-  const dateStr = uYear + '年' + uMonth + '月' + uDay + '日';
-  showPrizeReveal(prize, dateStr);
-
-  renderCalendar();
-  updateStats();
-  renderUnlockedList();
+  var prize = getPrize(entered, isFallback);
+  showPrizeReveal(prize, uYear+'年'+uMonth+'月'+uDay+'日');
+  renderCalendar(); updateStats(); renderUnlockedList();
   if (isAdmin) renderAllUsersRecords();
 }
 
@@ -971,337 +495,262 @@ function showPrizeReveal(prize, dateStr) {
   document.getElementById('revealEmoji').textContent = prize.emoji;
   document.getElementById('revealDate').textContent = dateStr + ' 开奖';
   document.getElementById('revealName').textContent = prize.name;
-  const tip = document.getElementById('revealHongbaoTip');
-  const sub = document.getElementById('revealSub');
-  const confirmBtn = document.getElementById('prizeConfirmBtn');
+  var tip = document.getElementById('revealHongbaoTip');
+  var sub = document.getElementById('revealSub');
   if (prize.special) {
-    tip.style.display = 'block';
-    sub.style.display = 'none';
-    confirmBtn.textContent = '好的，截图发群里 🎉';
-    document.getElementById('prizeReveal').classList.add('show');
-    launchConfetti();
+    tip.style.display='block'; sub.style.display='none';
+    document.getElementById('prizeConfirmBtn').textContent='好的，截图发群里 🎉';
   } else {
-    tip.style.display = 'none';
-    sub.textContent = '恭喜获得！截图发到群里领取';
-    sub.style.display = 'block';
-    confirmBtn.textContent = '好的，截图发群里 🎉';
-    document.getElementById('prizeReveal').classList.add('show');
-    launchConfetti();
+    tip.style.display='none'; sub.textContent='恭喜获得！截图发到群里领取'; sub.style.display='block';
+    document.getElementById('prizeConfirmBtn').textContent='好的，截图发群里 🎉';
   }
+  document.getElementById('prizeReveal').classList.add('show');
+  launchConfetti();
 }
-
-function closePrizeReveal() {
-  document.getElementById('prizeReveal').classList.remove('show');
-  document.getElementById('confettiWrap').innerHTML = '';
-}
-
+function closePrizeReveal() { document.getElementById('prizeReveal').classList.remove('show'); document.getElementById('confettiWrap').innerHTML=''; }
 function launchConfetti() {
-  const colors = ['#ffd700','#52c41a','#1890ff','#ff4d4f','#faad14','#722ed1'];
-  const wrap = document.getElementById('confettiWrap');
-  wrap.innerHTML = '';
-  for (let i = 0; i < 60; i++) {
-    const p = document.createElement('div');
-    p.className = 'confetti-piece';
-    p.style.cssText = 'left:' + (Math.random()*100) + 'vw;background:' + colors[Math.floor(Math.random()*colors.length)] + ';width:' + (6+Math.random()*8) + 'px;height:' + (6+Math.random()*8) + 'px;animation-duration:' + (1.5+Math.random()*2) + 's;animation-delay:' + (Math.random()*0.5) + 's;border-radius:' + (Math.random()>0.5?'50%':'2px') + ';';
-    wrap.appendChild(p);
-  }
+  var colors=['#ffd700','#52c41a','#1890ff','#ff4d4f','#faad14','#722ed1'];
+  var wrap=document.getElementById('confettiWrap'); wrap.innerHTML='';
+  for(var i=0;i<60;i++){var p=document.createElement('div');p.className='confetti-piece';p.style.cssText='left:'+(Math.random()*100)+'vw;background:'+colors[Math.floor(Math.random()*colors.length)]+';width:'+(6+Math.random()*8)+'px;height:'+(6+Math.random()*8)+'px;animation-duration:'+(1.5+Math.random()*2)+'s;animation-delay:'+(Math.random()*0.5)+'s;border-radius:'+(Math.random()>0.5?'50%':'2px')+';';wrap.appendChild(p);}
 }
 
 // ===== 统计 =====
 function updateStats() {
-  const unlocked = loadUnlocked(currentUser);
-  const keys = Object.keys(unlocked);
-  let totalValue = 0;
-  keys.forEach(function(k) {
-    const rec = unlocked[k];
-    totalValue += getPrize(rec && rec.code ? rec.code : '0000', rec && rec.fallback ? true : false).value || 0;
+  var unlocked = loadUnlocked(currentUser);
+  var keys = Object.keys(unlocked);
+  var totalValue = 0;
+  keys.forEach(function(k){
+    var rec=unlocked[k];
+    totalValue += getPrize(rec&&rec.code?rec.code:'0000', rec&&rec.fallback?true:false).value||0;
   });
   document.getElementById('statDays').textContent = keys.length;
-  document.getElementById('statValue').textContent = totalValue.toFixed(1) + 'U';
+  document.getElementById('statValue').textContent = totalValue.toFixed(1)+'U';
 }
 
 function renderUnlockedList() {
-  const unlocked = loadUnlocked(currentUser);
-  const keys = Object.keys(unlocked).sort().reverse();
-  const container = document.getElementById('unlockedItems');
-  if (keys.length === 0) {
-    container.innerHTML = '<div style="color:#888;font-size:12px;text-align:center;padding:12px;">暂无开奖记录，将交易截图发给管理员获取解锁码 🔗</div>';
-    return;
-  }
-  const sortedKeys = [...keys].sort();
-  const first = sortedKeys[0].replace(/_/g,'/');
-  const last = sortedKeys[sortedKeys.length-1].replace(/_/g,'/');
-  let totalVal = 0;
-  keys.forEach(function(k) {
-    const rec = unlocked[k];
-    totalVal += getPrize(rec && rec.code ? rec.code : '0000', rec && rec.fallback ? true : false).value || 0;
-  });
-  const statsHtml = '<div style="display:flex;justify-content:space-between;padding:8px 14px;background:#111a2a;border-radius:8px;margin-bottom:8px;font-size:12px;color:#bbb;"><span>🏆 共开奖 <strong style="color:#ffd700;">' + keys.length + '</strong> 天</span><span>📅 ' + first + ' — ' + last + '</span><span>💰 累计奖励值 <strong style="color:#52c41a;">' + totalVal.toFixed(1) + 'U+</strong></span></div>';
-  container.innerHTML = statsHtml + keys.map(function(k) {
-    const parts = k.split('_').map(Number);
-    const y = parts[0], m = parts[1], d = parts[2];
-    const rec = unlocked[k];
-    const prize = getPrize(rec && rec.code ? rec.code : '0000', rec && rec.fallback ? true : false);
-    let timeStr = '';
-    if (rec && rec.ts) {
-      const dt = new Date(rec.ts);
-      timeStr = '<span style="color:#aaa;font-size:11px;">⏱ ' + dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0') + ' ' + String(dt.getHours()).padStart(2,'0') + ':' + String(dt.getMinutes()).padStart(2,'0') + '</span>';
-    }
-    const fallbackTag = (rec && rec.fallback) ? '<span style="color:#ff7875;font-size:10px;margin-left:4px;">保底</span>' : '';
-    return '<div class="unlocked-item" style="flex-direction:column;align-items:flex-start;gap:4px;"><div style="display:flex;justify-content:space-between;width:100%;"><span class="date-tag">📅 ' + y + '年' + m + '月' + d + '日</span><span style="color:#52c41a;font-weight:bold;">' + prize.emoji + ' ' + prize.name + fallbackTag + '</span></div><div style="display:flex;gap:12px;">' + timeStr + '</div></div>';
+  var unlocked = loadUnlocked(currentUser);
+  var keys = Object.keys(unlocked).sort().reverse();
+  var container = document.getElementById('unlockedItems');
+  if (!keys.length) { container.innerHTML='<div style="color:#888;font-size:12px;text-align:center;padding:12px;">暂无开奖记录，将交易截图发给管理员获取解锁码 🔗</div>'; return; }
+  var sortedKeys=[...keys].sort();
+  var first=sortedKeys[0].replace(/_/g,'/'), last=sortedKeys[sortedKeys.length-1].replace(/_/g,'/');
+  var totalVal=0;
+  keys.forEach(function(k){ var rec=unlocked[k]; totalVal+=getPrize(rec&&rec.code?rec.code:'0000',rec&&rec.fallback?true:false).value||0; });
+  var statsHtml='<div style="display:flex;justify-content:space-between;padding:8px 14px;background:#111a2a;border-radius:8px;margin-bottom:8px;font-size:12px;color:#bbb;flex-wrap:wrap;gap:4px;"><span>🏆 共开奖 <strong style="color:#ffd700;">'+keys.length+'</strong> 天</span><span>📅 '+first+' — '+last+'</span><span>💰 累计奖励值 <strong style="color:#52c41a;">'+totalVal.toFixed(1)+'U+</strong></span></div>';
+  container.innerHTML = statsHtml + keys.map(function(k){
+    var parts=k.split('_').map(Number), y=parts[0],m=parts[1],d=parts[2];
+    var rec=unlocked[k];
+    var prize=getPrize(rec&&rec.code?rec.code:'0000',rec&&rec.fallback?true:false);
+    var timeStr='';
+    if(rec&&rec.ts){var dt=new Date(rec.ts);timeStr=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0')+' '+String(dt.getHours()).padStart(2,'0')+':'+String(dt.getMinutes()).padStart(2,'0');}
+    var codeStr=(rec&&rec.code)?'解锁码：<span style="color:#ffd700;letter-spacing:2px;font-weight:bold;">'+rec.code+'</span>':'';
+    var fallbackTag=(rec&&rec.fallback)?'<span style="color:#ff7875;font-size:10px;margin-left:4px;">保底</span>':'';
+    return '<div class="unlocked-item" style="flex-direction:column;align-items:flex-start;gap:4px;"><div style="display:flex;justify-content:space-between;width:100%;"><span style="color:#bbb;">📅 '+y+'年'+m+'月'+d+'日</span><span style="color:#52c41a;font-weight:bold;">'+prize.emoji+' '+prize.name+fallbackTag+'</span></div><div style="display:flex;gap:12px;font-size:11px;color:#666;">'+codeStr+(timeStr?'<span>⏱ '+timeStr+'</span>':'')+'</div></div>';
   }).join('');
 }
 
-// ===== 用户开奖记录总览（管理员）=====
+// ===== 管理员 - 用户开奖记录总览 =====
 function renderAllUsersRecords() {
-  const container = document.getElementById('allUsersRecords');
+  var container = document.getElementById('allUsersRecords');
   if (!container) return;
+  var PREFIX = 'okx_cal_';
+  var keyword = (document.getElementById('uidSearch')||{value:''}).value.trim().toLowerCase();
 
-  const PREFIX = 'okx_cal_';
-  const searchEl = document.getElementById('uidSearch');
-  const keyword = searchEl ? searchEl.value.trim().toLowerCase() : '';
-
-  // 只收集数字UID（设备ID不显示也不计入预算）
-  const allUids = [];
-  const numericUids = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const k = localStorage.key(i);
-    if (!k || !k.startsWith(PREFIX)) continue;
-    const uid = k.slice(PREFIX.length);
-    if (!/^\d+$/.test(uid)) continue; // 跳过设备ID（非纯数字）
-    if (!keyword || uid.toLowerCase().includes(keyword)) allUids.push(uid);
+  // 只处理纯数字UID
+  var allUids=[], numericUids=[];
+  for (var i=0;i<localStorage.length;i++) {
+    var k=localStorage.key(i);
+    if (!k||!k.startsWith(PREFIX)) continue;
+    var uid=k.slice(PREFIX.length);
+    if (!/^\d+$/.test(uid)) continue;
+    if (!keyword||uid.toLowerCase().includes(keyword)) allUids.push(uid);
     numericUids.push(uid);
   }
 
-  // 计算预算（只统计数字UID）
-  let grandTotal = 0;
-  numericUids.forEach(function(uid) {
-    const data = loadUnlocked(uid);
-    Object.values(data).forEach(function(rec) {
-      grandTotal += getPrize(rec && rec.code ? rec.code : '0000', rec && rec.fallback ? true : false).value || 0;
+  // 计算预算
+  var grandTotal=0;
+  numericUids.forEach(function(uid){
+    var data=loadUnlocked(uid);
+    Object.values(data).forEach(function(rec){
+      grandTotal+=getPrize(rec&&rec.code?rec.code:'0000',rec&&rec.fallback?true:false).value||0;
     });
   });
+  var spent=Math.round(grandTotal*100)/100;
+  var remaining=Math.round((BUDGET-grandTotal)*100)/100;
+  var pct=Math.min(100,Math.round(grandTotal/BUDGET*100));
+  var overBudget=grandTotal>BUDGET;
+  document.getElementById('adminTotalSent').textContent=spent+'U';
+  var remEl=document.getElementById('adminRemaining');
+  remEl.textContent=(overBudget?'-':'')+Math.abs(remaining)+'U';
+  remEl.style.color=overBudget?'#ff4d4f':'#1890ff';
+  document.getElementById('adminTotalUsers').textContent=numericUids.length;
+  document.getElementById('adminBudgetPct').textContent=pct+'%';
+  var fillEl=document.getElementById('adminBudgetFill');
+  fillEl.style.width=pct+'%';
+  fillEl.style.background=overBudget?'linear-gradient(90deg,#ff4d4f,#ff7875)':pct>80?'linear-gradient(90deg,#faad14,#ffd700)':'linear-gradient(90deg,#52c41a,#1890ff)';
+  var obEl=document.getElementById('adminOverBudget');
+  if(overBudget){obEl.style.display='flex';document.getElementById('adminOverAmount').textContent=Math.round((grandTotal-BUDGET)*100)/100+'U';}
+  else obEl.style.display='none';
 
-  // 更新预算条
-  const spent = Math.round(grandTotal * 100) / 100;
-  const remaining = Math.round((BUDGET - grandTotal) * 100) / 100;
-  const pct = Math.min(100, Math.round(grandTotal / BUDGET * 100));
-  const overBudget = grandTotal > BUDGET;
-  const overAmt = Math.round((grandTotal - BUDGET) * 100) / 100;
-
-  document.getElementById('adminTotalSent').textContent = spent + 'U';
-  const remEl = document.getElementById('adminRemaining');
-  remEl.textContent = (overBudget ? '-' : '') + Math.abs(remaining) + 'U';
-  remEl.style.color = overBudget ? '#ff4d4f' : '#1890ff';
-  document.getElementById('adminTotalUsers').textContent = numericUids.length;
-  document.getElementById('adminBudgetPct').textContent = pct + '%';
-  const fillEl = document.getElementById('adminBudgetFill');
-  fillEl.style.width = pct + '%';
-  fillEl.style.background = overBudget
-    ? 'linear-gradient(90deg,#ff4d4f,#ff7875)'
-    : pct > 80
-      ? 'linear-gradient(90deg,#faad14,#ffd700)'
-      : 'linear-gradient(90deg,#52c41a,#1890ff)';
-  const obEl = document.getElementById('adminOverBudget');
-  if (overBudget) {
-    obEl.style.display = 'flex';
-    document.getElementById('adminOverAmount').textContent = overAmt + 'U';
-  } else {
-    obEl.style.display = 'none';
-  }
-
-  // 渲染用户卡片
   if (!allUids.length) {
-    container.innerHTML = keyword
-      ? '<div style="color:#aaa;font-size:13px;text-align:center;padding:24px;">未找到匹配 "<strong style="color:#ffd700;">' + keyword + '</strong>" 的用户</div>'
-      : '<div style="color:#aaa;font-size:13px;text-align:center;padding:24px;">暂无用户开奖记录</div>';
+    container.innerHTML=keyword?'<div style="color:#aaa;font-size:13px;text-align:center;padding:24px;">未找到匹配 "<strong style="color:#ffd700;">'+keyword+'</strong>" 的用户</div>':'<div style="color:#aaa;font-size:13px;text-align:center;padding:24px;">暂无用户开奖记录</div>';
     return;
   }
-
   allUids.sort();
-  const cards = allUids.map(function(uid) {
-    const unlocked = loadUnlocked(uid);
-    const keys = Object.keys(unlocked).sort();
-    if (!keys.length) return '';
-    let totalVal = 0;
-    const rows = keys.map(function(k) {
-      const parts = k.split('_').map(Number);
-      const y = parts[0], m = parts[1], d = parts[2];
-      const rec = unlocked[k];
-      const prize = getPrize(rec && rec.code ? rec.code : '0000', rec && rec.fallback ? true : false);
-      totalVal += prize.value || 0;
-      let timeStr = '';
-      if (rec && rec.ts) {
-        const dt = new Date(rec.ts);
-        timeStr = String(dt.getMonth()+1).padStart(2,'0') + '/' + String(dt.getDate()).padStart(2,'0') + ' ' + String(dt.getHours()).padStart(2,'0') + ':' + String(dt.getMinutes()).padStart(2,'0');
-      }
-      const manualTag = (rec && rec.manual) ? '<span style="color:#b37feb;font-size:10px;margin-left:4px;">手动</span>' : '';
-      const fallbackTag = (rec && rec.fallback) ? '<span style="color:#ff7875;font-size:10px;margin-left:4px;">保底</span>' : '';
-      return '<div style="background:#111c2e;border-radius:8px;padding:8px 10px;margin-bottom:6px;border-left:3px solid #52c41a;"><div style="display:flex;justify-content:space-between;align-items:center;"><span style="color:#ddd;font-size:12px;font-weight:bold;">📅 ' + y + '年' + m + '月' + d + '日</span><span style="color:#52c41a;font-size:13px;font-weight:bold;">' + prize.emoji + ' ' + prize.name + manualTag + fallbackTag + '</span></div>' + (timeStr ? '<div style="margin-top:4px;"><span style="color:#888;font-size:11px;">⏱ ' + timeStr + '</span></div>' : '') + '</div>';
+  var cards=allUids.map(function(uid){
+    var unlocked=loadUnlocked(uid);
+    var keys=Object.keys(unlocked).sort();
+    if(!keys.length) return '';
+    var totalVal=0;
+    var rows=keys.map(function(k){
+      var parts=k.split('_').map(Number),y=parts[0],m=parts[1],d=parts[2];
+      var rec=unlocked[k];
+      var prize=getPrize(rec&&rec.code?rec.code:'0000',rec&&rec.fallback?true:false);
+      totalVal+=prize.value||0;
+      var timeStr='';
+      if(rec&&rec.ts){var dt=new Date(rec.ts);timeStr=String(dt.getMonth()+1).padStart(2,'0')+'/'+String(dt.getDate()).padStart(2,'0')+' '+String(dt.getHours()).padStart(2,'0')+':'+String(dt.getMinutes()).padStart(2,'0');}
+      var codeStr=(rec&&rec.code)?'<span style="color:#ffd700;font-size:11px;letter-spacing:2px;">🔑 '+rec.code+'</span>':'';
+      var manualTag=(rec&&rec.manual)?'<span style="color:#b37feb;font-size:10px;margin-left:4px;">手动</span>':'';
+      var fallbackTag=(rec&&rec.fallback)?'<span style="color:#ff7875;font-size:10px;margin-left:4px;">保底</span>':'';
+      return '<div style="background:#111c2e;border-radius:8px;padding:8px 10px;margin-bottom:6px;border-left:3px solid #52c41a;"><div style="display:flex;justify-content:space-between;align-items:center;"><span style="color:#ddd;font-size:12px;font-weight:bold;">📅 '+y+'年'+m+'月'+d+'日</span><span style="color:#52c41a;font-size:13px;font-weight:bold;">'+prize.emoji+' '+prize.name+manualTag+fallbackTag+'</span></div>'+(timeStr||codeStr?'<div style="display:flex;gap:10px;margin-top:4px;align-items:center;">'+codeStr+(timeStr?'<span style="color:#888;font-size:11px;">⏱ '+timeStr+'</span>':'')+'</div>':'')+'</div>';
     }).join('');
-    const displayUID = uid.length > 12 ? uid.slice(0,12) + '…' : uid;
-    return '<div style="background:#0d1828;border:1px solid #1e3a5a;border-radius:12px;padding:14px;display:flex;flex-direction:column;min-width:0;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;padding-bottom:8px;border-bottom:2px solid #1e3a5a;"><div><div style="color:#ffd700;font-weight:bold;font-size:13px;" title="' + uid + '">UID: ' + displayUID + '</div><div style="color:#52c41a;font-size:11px;margin-top:2px;">共 ' + keys.length + ' 天 · ' + totalVal.toFixed(1) + 'U+</div></div></div><div style="overflow-y:auto;max-height:280px;">' + rows + '</div></div>';
+    // 完整显示UID（不截断）
+    return '<div style="background:#0d1828;border:1px solid #1e3a5a;border-radius:12px;padding:14px;display:flex;flex-direction:column;min-width:0;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;padding-bottom:8px;border-bottom:2px solid #1e3a5a;"><div style="min-width:0;"><div style="color:#ffd700;font-weight:bold;font-size:12px;word-break:break-all;">UID: '+uid+'</div><div style="color:#52c41a;font-size:11px;margin-top:2px;">共 '+keys.length+' 天 · '+totalVal.toFixed(1)+'U+</div></div></div><div style="overflow-y:auto;max-height:280px;">'+rows+'</div></div>';
   }).filter(Boolean);
-
-  if (!cards.length) {
-    container.innerHTML = '<div style="color:#aaa;font-size:13px;text-align:center;padding:16px;">暂无记录</div>';
-    return;
-  }
-  container.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;">' + cards.join('') + '</div>';
+  if(!cards.length){container.innerHTML='<div style="color:#aaa;font-size:13px;text-align:center;padding:16px;">暂无记录</div>';return;}
+  container.innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;">'+cards.join('')+'</div>';
 }
 
 // ===== 管理员工具 =====
 function generateCode() {
-  const dateVal = document.getElementById('adminDate').value;
-  if (!dateVal) { alert('请选择日期'); return; }
-  const parts = dateVal.split('-').map(Number);
-  const year = parts[0], month = parts[1], day = parts[2];
-  const code = generateDiceCode(day);
-  const prize = getPrize(code);
-  const dateStr = year + '年' + month + '月' + day + '日';
-  document.getElementById('resDate').textContent = dateStr;
-  document.getElementById('resCode').textContent = code;
-  document.getElementById('resPrize').textContent = '预测奖励：' + prize.emoji + ' ' + prize.name;
-  document.getElementById('adminResult').style.display = 'block';
+  var dateVal=document.getElementById('adminDate').value;
+  if(!dateVal){alert('请选择日期');return;}
+  var parts=dateVal.split('-').map(Number),year=parts[0],month=parts[1],day=parts[2];
+  var code=generateDiceCode(day);
+  var prize=getPrize(code);
+  document.getElementById('resDate').textContent=year+'年'+month+'月'+day+'日';
+  document.getElementById('resCode').textContent=code;
+  document.getElementById('resPrize').textContent='预测奖励：'+prize.emoji+' '+prize.name;
+  document.getElementById('adminResult').style.display='block';
 }
 
 function exportRecords() {
-  const PREFIX = 'okx_cal_';
-  const data = {};
-  for (let i = 0; i < localStorage.length; i++) {
-    const k = localStorage.key(i);
-    if (k && k.startsWith(PREFIX)) data[k] = localStorage.getItem(k);
-  }
-  if (!Object.keys(data).length) { alert('暂无记录可导出'); return; }
-  const json = JSON.stringify(data, null, 2);
-  const blob = new Blob([json], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  const now = new Date();
-  a.href = url;
-  a.download = 'okx_records_backup_' + now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') + '.json';
-  a.click();
-  URL.revokeObjectURL(url);
+  var PREFIX='okx_cal_',data={};
+  for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.startsWith(PREFIX))data[k]=localStorage.getItem(k);}
+  if(!Object.keys(data).length){alert('暂无记录可导出');return;}
+  var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  var url=URL.createObjectURL(blob),a=document.createElement('a'),now=new Date();
+  a.href=url; a.download='okx_records_backup_'+now.getFullYear()+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0')+'.json';
+  a.click(); URL.revokeObjectURL(url);
 }
 
 function importRecords(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const data = JSON.parse(e.target.result);
-      let count = 0;
-      for (const key in data) {
-        if (key.startsWith('okx_cal_')) { localStorage.setItem(key, data[key]); count++; }
-      }
-      alert('导入成功！共复原 ' + count + ' 个用户记录');
-      renderAllUsersRecords();
-    } catch(err) { alert('文件格式错误，请确认是有效的备份 JSON 文件'); }
-    input.value = '';
+  var file=input.files[0]; if(!file) return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{var data=JSON.parse(e.target.result),count=0;for(var key in data){if(key.startsWith('okx_cal_')){localStorage.setItem(key,data[key]);count++;}}alert('导入成功！共复原 '+count+' 个用户记录');renderAllUsersRecords();}
+    catch(err){alert('文件格式错误');}
+    input.value='';
   };
   reader.readAsText(file);
 }
 
 function clearSingleUID() {
-  const uid = prompt('请输入要清除的用户UID：');
-  if (!uid) return;
-  const key = 'okx_cal_' + uid.trim();
-  if (!localStorage.getItem(key)) { alert('未找到 UID: ' + uid.trim() + ' 的记录'); return; }
-  if (confirm('确定清除 UID: ' + uid.trim() + ' 的所有开奖记录？此操作不可撤销。')) {
-    localStorage.removeItem(key);
-    alert('已清除');
-    renderAllUsersRecords();
-  }
+  var uid=prompt('请输入要清除的用户UID：');if(!uid) return;
+  var key='okx_cal_'+uid.trim();
+  if(!localStorage.getItem(key)){alert('未找到 UID: '+uid.trim()+' 的记录');return;}
+  if(confirm('确定清除 UID: '+uid.trim()+' 的所有开奖记录？此操作不可撤销。')){localStorage.removeItem(key);alert('已清除');renderAllUsersRecords();}
 }
 
 function clearAllRecords() {
-  const PREFIX = 'okx_cal_';
-  const keys = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const k = localStorage.key(i);
-    if (k && k.startsWith(PREFIX)) keys.push(k);
+  var PREFIX='okx_cal_',keys=[];
+  for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.startsWith(PREFIX))keys.push(k);}
+  if(!keys.length){alert('暂无记录');return;}
+  if(!confirm('⚠️ 确定清除全部 '+keys.length+' 个用户的开奖记录？\n建议先导出备份！\n此操作不可撤销。')) return;
+  if(prompt('请输入 "CLEAR" 确认清除：')!=='CLEAR'){alert('输入错误，已取消');return;}
+  keys.forEach(function(k){localStorage.removeItem(k);});
+  alert('已清除 '+keys.length+' 个用户的所有记录');
+  renderAllUsersRecords();
+}
+
+// ===== 月份复原 =====
+function resetMonthlyBudget() {
+  var PREFIX = 'okx_cal_';
+  // 只清除数字UID的记录（计入预算的记录）
+  var keys = [];
+  for (var i = 0; i < localStorage.length; i++) {
+    var k = localStorage.key(i);
+    if (!k || !k.startsWith(PREFIX)) continue;
+    var uid = k.slice(PREFIX.length);
+    if (/^\d+$/.test(uid)) keys.push(k);
   }
-  if (!keys.length) { alert('暂无记录'); return; }
-  if (!confirm('⚠️ 确定清除全部 ' + keys.length + ' 个用户的开奖记录？\n建议先点「导出备份」保存数据！\n此操作不可撤销。')) return;
-  const confirmText = prompt('请输入 "CLEAR" 确认清除：');
-  if (confirmText !== 'CLEAR') { alert('输入错误，已取消'); return; }
+  if (!keys.length) { alert('当前没有用户记录，无需复原'); return; }
+  var now = new Date();
+  var monthStr = now.getFullYear() + '年' + (now.getMonth()+1) + '月';
+  if (!confirm('🔄 月份复原确认\n\n将清除全部 ' + keys.length + ' 个用户共计本月记录\n下月重新以 150U 预算开始\n\n⚠️ 操作前建议先点「导出备份」保存本月数据！\n\n确认复原' + monthStr + '数据？')) return;
+  if (prompt('请输入 "NEW" 确认开启新一期：') !== 'NEW') { alert('输入错误，已取消'); return; }
   keys.forEach(function(k) { localStorage.removeItem(k); });
-  alert('已清除 ' + keys.length + ' 个用户的所有记录');
+  alert('✅ 复原完成！已清除 ' + keys.length + ' 个用户的记录\n新一期预算已重置为 150U，可以开始新月运营了 🎉');
   renderAllUsersRecords();
 }
 
 // ===== 手动登记奖励 =====
 function showManualAdd() {
-  const modal = document.getElementById('manualAddModal');
-  modal.style.display = 'flex';
-  const now = new Date();
-  const yyyy = now.getFullYear();
-  const mm = String(now.getMonth()+1).padStart(2,'0');
-  const dd = String(now.getDate()).padStart(2,'0');
-  document.getElementById('manualDate').value = yyyy + '-' + mm + '-' + dd;
-  document.getElementById('manualUID').value = '';
-  document.getElementById('manualPreview').style.display = 'none';
-  document.getElementById('manualAddMsg').style.display = 'none';
-  ['manualUID','manualDate'].forEach(function(id) {
-    document.getElementById(id).oninput = updateManualPreview;
-  });
+  var modal=document.getElementById('manualAddModal');
+  modal.style.display='flex';
+  var now=new Date();
+  document.getElementById('manualDate').value=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+  document.getElementById('manualUID').value='';
+  document.getElementById('manualCode').value='';
+  document.getElementById('manualPreview').style.display='none';
+  document.getElementById('manualAddMsg').style.display='none';
+  ['manualUID','manualDate'].forEach(function(id){ document.getElementById(id).oninput=updateManualPreview; });
+}
+
+// 自动填充解锁码（用于没事先生成码的情况）
+function autoFillManualCode() {
+  var dateVal=document.getElementById('manualDate').value;
+  if(!dateVal){alert('请先选择日期');return;}
+  var day=parseInt(dateVal.split('-')[2]);
+  document.getElementById('manualCode').value=generateDiceCode(day);
   updateManualPreview();
 }
 
 function updateManualPreview() {
-  const uid = document.getElementById('manualUID').value.trim();
-  const dateVal = document.getElementById('manualDate').value;
-  const preview = document.getElementById('manualPreview');
-  if (!uid || !dateVal) { preview.style.display = 'none'; return; }
-  const parts = dateVal.split('-').map(Number);
-  const d = parts[2];
-  const code = generateDiceCode(d);
-  // Store preview code for use in doManualAdd
-  preview.dataset.previewCode = code;
-  const prize = getPrize(code);
-  document.getElementById('manualCodePreview').textContent = code;
-  document.getElementById('manualPreviewPrize').textContent = prize.emoji + ' ' + prize.name;
-  preview.style.display = 'block';
+  var code=document.getElementById('manualCode').value.trim();
+  var preview=document.getElementById('manualPreview');
+  if(!code||code.length!==4){preview.style.display='none';return;}
+  var prize=getPrize(code);
+  document.getElementById('manualPreviewPrize').textContent=prize.emoji+' '+prize.name;
+  preview.style.display='block';
 }
 
 function doManualAdd() {
-  const uid = document.getElementById('manualUID').value.trim();
-  const dateVal = document.getElementById('manualDate').value;
-  const msgEl = document.getElementById('manualAddMsg');
-  function showMsg(text, ok) {
-    msgEl.textContent = text;
-    msgEl.style.background = ok ? '#0d2a1a' : '#2a0d0d';
-    msgEl.style.color = ok ? '#52c41a' : '#ff7875';
-    msgEl.style.border = '1px solid ' + (ok ? '#52c41a44' : '#ff4d4f44');
-    msgEl.style.display = 'block';
-  }
-  if (!uid) { showMsg('请填写用户 UID', false); return; }
-  if (!dateVal) { showMsg('请选择开奖日期', false); return; }
-  const parts = dateVal.split('-').map(Number);
-  const y = parts[0], m = parts[1], d = parts[2];
-  const dateKey = y + '_' + m + '_' + d;
-  const unlocked = loadUnlocked(uid);
-  if (unlocked[dateKey]) {
-    showMsg('UID ' + uid + ' 在 ' + y + '年' + m + '月' + d + '日 已有记录，无需重复登记', false);
-    return;
-  }
-  // 生成一个解锁码
-  const code = generateDiceCode(d);
-  // 检查是否超出预算（手动登记也遵守预算规则）
-  const currentTotal = getTotalBudgetUsed();
-  const isFallback = /^\d+$/.test(uid) && currentTotal >= BUDGET;
-  unlocked[dateKey] = { ts: Date.now(), uid: uid, manual: true, code: code, fallback: isFallback };
-  saveUnlocked(uid, unlocked);
-  const prize = getPrize(code, isFallback);
-  showMsg('✅ 已登记！' + y + '年' + m + '月' + d + '日 · ' + prize.emoji + ' ' + prize.name, true);
+  var uid=document.getElementById('manualUID').value.trim();
+  var dateVal=document.getElementById('manualDate').value;
+  var code=document.getElementById('manualCode').value.trim();
+  var msgEl=document.getElementById('manualAddMsg');
+  function showMsg(text,ok){msgEl.textContent=text;msgEl.style.background=ok?'#0d2a1a':'#2a0d0d';msgEl.style.color=ok?'#52c41a':'#ff7875';msgEl.style.border='1px solid '+(ok?'#52c41a44':'#ff4d4f44');msgEl.style.display='block';}
+  if(!uid){showMsg('请填写用户 UID',false);return;}
+  if(!dateVal){showMsg('请选择开奖日期',false);return;}
+  if(!code||code.length!==4||!/^\d{4}$/.test(code)){showMsg('请填写4位数字解锁码',false);return;}
+  var parts=dateVal.split('-').map(Number),y=parts[0],m=parts[1],d=parts[2];
+  // 验证码末两位是否匹配日期
+  if(!verifyDiceCode(code, d)){showMsg('解锁码末两位应为 '+d.toString().padStart(2,'0')+'（日期），请检查',false);return;}
+  var dateKey=y+'_'+m+'_'+d;
+  var unlocked=loadUnlocked(uid);
+  if(unlocked[dateKey]){showMsg('UID '+uid+' 在 '+y+'年'+m+'月'+d+'日 已有记录，无需重复登记',false);return;}
+  var currentTotal=getTotalBudgetUsed();
+  var isFallback=/^\d+$/.test(uid)&&currentTotal>=BUDGET;
+  unlocked[dateKey]={ts:Date.now(),uid:uid,manual:true,code:code,fallback:isFallback};
+  saveUnlocked(uid,unlocked);
+  var prize=getPrize(code,isFallback);
+  showMsg('✅ 已登记！'+y+'年'+m+'月'+d+'日 · '+prize.emoji+' '+prize.name,true);
   renderAllUsersRecords();
-  setTimeout(function(){ closeManualAdd(); }, 1800);
+  setTimeout(function(){closeManualAdd();},1800);
 }
 
-function closeManualAdd() {
-  document.getElementById('manualAddModal').style.display = 'none';
-}
+function closeManualAdd() { document.getElementById('manualAddModal').style.display='none'; }
 </script>
 </body>
 </html>
